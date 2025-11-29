@@ -1,0 +1,26 @@
+Third‑Party Notices and Attributions
+
+This repository contains built assets that include the following third‑party libraries and brand materials. The following are credited to their respective owners and governed by their own licenses or brand guidelines.
+
+Libraries
+- GSAP (GreenSock Animation Platform) and ScrollTrigger
+  • Copyright © GreenSock, Inc.
+  • License and terms: https://greensock.com/licensing/
+
+- Lenis (smooth scrolling) by Studio Freight
+  • MIT License
+  • https://github.com/studio-freight/lenis
+
+Brand Badges
+- “Download on the App Store” badge
+  • Apple Marketing Guidelines and usage terms apply
+  • https://developer.apple.com/app-store/marketing/
+
+- “GET IT ON Google Play” badge
+  • Google Play Brand Guidelines and usage terms apply
+  • https://play.google.com/intl/en_us/badges/
+
+Fonts and Other Assets
+- Alimama FangYuanTi Variable (VF) – subject to the provider’s license/terms. Ensure commercial/web embedding rights are observed.
+
+Unless otherwise stated, all other code, text, and media in this repository are © Eyayoo Studio. All rights reserved.
