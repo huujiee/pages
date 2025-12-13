@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>Eyayoo Studio</title>
+    <meta name="description" content="小小欢喜，每天发生。为每个日常时刻而作。Eyayoo Studio 官方站点。" />
+    <link rel="canonical" href="https://eyayoo.com/zh/" />
+    <link rel="alternate" hreflang="zh-CN" href="https://eyayoo.com/zh/" />
+    <link rel="alternate" hreflang="en" href="https://eyayoo.com/" />
+    <link rel="alternate" hreflang="x-default" href="https://eyayoo.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Eyayoo Studio — 小小欢喜，每天发生" />
+    <meta property="og:description" content="为每个日常时刻而作。我们的移动应用持续打磨体验与品质。" />
+    <meta property="og:url" content="https://eyayoo.com/zh/" />
+    <meta property="og:image" content="https://eyayoo.com/assets/og-default.jpg" />
+    <meta property="og:image" content="https://eyayoo.com/assets/og-default.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://eyayoo.com/assets/og-default.jpg" />
+    <!-- Prevent i18n flash: decide language early and hide until applied -->
+    <script>(function(){try{var p=new URLSearchParams(location.search);var u=p.get('lang');var s=null;try{s=localStorage.getItem('lang')}catch(e){};var d=(document.documentElement.lang||'').toLowerCase().indexOf('zh')===0?'zh':'en';var b=((navigator.languages&&navigator.languages[0])||navigator.language||'').toLowerCase().indexOf('zh')===0?'zh':'en';var lang='zh';document.documentElement.setAttribute('data-preset-lang',lang);document.documentElement.lang=(lang==='zh'?'zh-CN':'en');document.documentElement.classList.add('no-i18n-flash');}catch(e){}})();</script>
+    <style>.no-i18n-flash body{visibility:hidden}</style>
+    <link rel="preload" as="font" href="../assets/AlimamaFangYuanTiVF-Thin-2.subset.woff2" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="../styles.css" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav">
+        <button id="menu-toggle" class="menu-btn" aria-label="Open menu" aria-expanded="false">☰</button>
+        <a href="./index.html#home" class="brand">Eyayoo Studio</a>
+        <div class="spacer"></div>
+        <div class="nav-links" id="nav-links">
+          <a id="nav-home" href="#home">首页</a>
+          <a id="nav-products" href="#apps">应用</a>
+          <a id="nav-about" href="#about">关于</a>
+          <a id="nav-contact" href="#contact">联系</a>
+          <a id="nav-privacy" href="../privacy.html">隐私</a>
+          <a id="nav-terms" href="../terms.html">条款</a>
+          <button id="lang-toggle" class="lang-btn" aria-label="Toggle language">EN</button>
+          <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">☾</button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- 全局装饰光球（贯穿多屏移动） -->
+    <div class="global-decor" aria-hidden="true">
+      <div class="gball g1"></div>
+      <div class="gball g2"></div>
+      <div class="gball g3"></div>
+    </div>
+
+    <!-- Scene 1: Hero -->
+    <section class="scene hero" id="home" aria-label="Hero">
+      <div class="pin">
+        <div class="bg"></div>
+        <div class="overlay"></div>
+        <div class="content">
+          <h1 id="hero-title">小小欢喜，每天发生</h1>
+          <p id="hero-sub">为每个日常时刻而作</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 2: Products (intro + grid) -->
+    <section class="scene products" id="apps" aria-label="Products">
+      <div class="pin">
+        <div class="bg"></div>
+        <div class="content">
+          <h2 id="products-title">我们的产品</h2>
+          <p id="products-desc">面向全球用户的移动应用，持续打磨体验与品质。</p>
+          <div class="product-grid" id="product-grid">
+            <article class="card" role="link" tabindex="0" aria-label="Open Funny Painting — Enlightenment" data-i="0" data-ios="https://apps.apple.com/us/app/funny-painting-enlightenment/id6478642781" data-android="https://play.google.com/store/apps/details?id=com.eyayoo.gp_paintmaster">
+              <img class="icon" src="../assets/products/funny-painting-enlightenment-ios/icon.png" width="128" height="128" alt="儿童奇妙绘画馆 - 绘画启蒙 图标" />
+              <div class="meta">
+                <h3 id="prod1-title">儿童奇妙绘画馆 - 绘画启蒙</h3>
+                <p id="prod1-tag" class="tag">教育 / 绘画启蒙</p>
+                <p id="prod1-desc" class="desc">从简单线条到色彩搭配，帮助儿童快乐启蒙与创意表达，支持离线创作与家长共享。</p>
+              </div>
+            </article>
+            <article class="card" role="link" tabindex="0" aria-label="Open Mahjong Training — Be a Master" data-i="1" data-ios="https://apps.apple.com/us/app/mahjong-training-be-a-master/id6472035775" data-android="https://play.google.com/store/apps/details?id=com.eyayoo.gp_mahjongmaster">
+              <img class="icon" src="../assets/products/mahjong-training-be-a-master-ios/icon.png" width="128" height="128" alt="麻将训练 - 大师之路 图标" />
+              <div class="meta">
+                <h3 id="prod2-title">麻将训练 - 大师之路</h3>
+                <p id="prod2-tag" class="tag">益智 / 训练</p>
+                <p id="prod2-desc" class="desc">通过专项训练与实战练习提升麻将技巧，随时随地巩固牌技，助你迈向大师之路。</p>
+                <p style="margin-top:8px;"><a href="./mahjong-training.html" id="learn-link" class="learn-link" aria-label="Learn Mahjong rules and training">学习麻将 →</a></p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 3: About -->
+    <section class="scene vision" id="about" aria-label="Vision">
+      <div class="pin">
+        <div class="bg"></div>
+        <div class="content narrow">
+          <h2 id="about-title">关于我们</h2>
+          <p id="about-desc">自 2023 年起，我们从一人起步，成长为一支热忱且专业的团队，致力于让每天都更有趣。目前发布的两款产品收获了来自美国、英国、中国、巴西、香港、日本、比利时、法国、德国等地区玩家的下载与支持。我们专注每一个细节，持续打磨，力求打造独特的移动体验；旅程不会停下，始终以创造被玩家真心喜爱的产品为目标。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 4: Contact -->
+    <section class="scene contact" id="contact" aria-label="Contact">
+      <div class="pin">
+        <div class="bg"></div>
+        <div class="content narrow">
+          <h2 id="contact-title">联系我们</h2>
+          <p id="contact-desc">商务合作与支持，请通过邮箱联系。</p>
+
+          <form id="email-form" class="email-form" onsubmit="return false;">
+            <input type="text" name="_honeypot" id="hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true" />
+            <input type="hidden" id="email-started" name="started" value="" />
+            <input id="email-subject" type="text" placeholder="邮件标题" />
+            <textarea id="email-body" rows="6" placeholder="邮件内容"></textarea>
+            <div class="email-actions">
+              <button class="btn ghost" id="copy-email" type="button" aria-label="Copy email address">复制邮箱</button>
+              <button class="btn" id="email-submit" type="button" aria-label="Send email">发送邮件</button>
+            </div>
+            <small id="copy-hint" class="copy-hint" aria-live="polite"></small>
+            <small id="submit-hint" class="copy-hint" aria-live="polite"></small>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <p class="footer-links" style="text-align:center;margin:8px 0;">
+        <a id="footer-privacy" href="../privacy.html">Privacy</a>
+        · <a id="footer-terms" href="../terms.html">Terms</a>
+        · <a id="footer-contact" href="./contacts.html">联系</a>
+      </p>
+      <div class="store-badges">
+        <a href="https://apps.apple.com/us/developer/%E6%8D%B7-%E8%83%A1/id1716308769" aria-label="Download on the App Store" target="_blank" rel="noopener noreferrer"><img id="badge-appstore" src="../assets/Download_on_the_App_Store_Badge.svg" alt="Download on the App Store" loading="lazy" /></a>
+        <a href="https://play.google.com/store/apps/dev?id=8515797961223433505" aria-label="GET IT ON Google Play" target="_blank" rel="noopener noreferrer"><img id="badge-googleplay" src="../assets/Google_Play_Store_badge_EN.svg" alt="GET IT ON Google Play" loading="lazy" /></a>
+      </div>
+      <small>© Eyayoo Studio</small>
+    </footer>
+
+    <!-- Libraries via CDN -->
+    <!-- 本地依赖（如未提供，将自动使用原生动画降级方案） -->
+    <script src="../vendor/gsap.min.js" defer></script>
+    <script src="../vendor/ScrollTrigger.min.js" defer></script>
+    <script src="../vendor/lenis.min.js" defer></script>
+    <script src="../script.js" defer></script>
+  </body>
+  </html>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <title>Eyayoo — 小小欢喜，每天发生</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff9ac1"/>
+      <stop offset="1" stop-color="#66e0d3"/>
+    </linearGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" rx="36" fill="url(#bg)"/>
+  <g fill="#fff" filter="url(#shadow)">
+    <text x="600" y="300" text-anchor="middle"
+          font-family="'Alimama FangYuanTi VF','SF Pro Rounded','Avenir Next Rounded',Nunito,Quicksand,system-ui,-apple-system,'Segoe UI',Roboto,Noto Sans,Arial,sans-serif"
+          font-weight="800" font-size="96" letter-spacing="1.5">Eyayoo Studio</text>
+    <text x="600" y="380" text-anchor="middle"
+          font-family="'Alimama FangYuanTi VF','SF Pro Rounded','Avenir Next Rounded',Nunito,Quicksand,system-ui,-apple-system,'Segoe UI',Roboto,Noto Sans,Arial,sans-serif"
+          font-weight="700" font-size="40" letter-spacing="1">小小欢喜，每天发生</text>
+  </g>
+</svg>

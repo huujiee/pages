@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>联系 — Eyayoo Studio</title>
+    <meta name="description" content="商务合作与支持，请通过邮箱联系。可使用表单发送消息，或直接邮件联系。" />
+    <link rel="canonical" href="https://eyayoo.com/zh/contacts.html" />
+    <link rel="alternate" hreflang="zh-CN" href="https://eyayoo.com/zh/contacts.html" />
+    <link rel="alternate" hreflang="en" href="https://eyayoo.com/contacts.html" />
+    <link rel="alternate" hreflang="x-default" href="https://eyayoo.com/contacts.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="联系 — Eyayoo Studio" />
+    <meta property="og:description" content="商务合作与支持，请通过邮箱联系。" />
+    <meta property="og:url" content="https://eyayoo.com/zh/contacts.html" />
+    <meta property="og:image" content="https://eyayoo.com/assets/og-default.jpg" />
+    <meta property="og:image" content="https://eyayoo.com/assets/og-default.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://eyayoo.com/assets/og-default.jpg" />
+    <link rel="preload" as="font" href="../assets/AlimamaFangYuanTiVF-Thin-2.subset.woff2" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="../styles.css" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav">
+        <button id="menu-toggle" class="menu-btn" aria-label="Open menu" aria-expanded="false">☰</button>
+        <a href="../index.html#home" class="brand">Eyayoo Studio</a>
+        <div class="spacer"></div>
+        <div class="nav-links" id="nav-links">
+          <a id="nav-home" href="../index.html#home">首页</a>
+          <a id="nav-products" href="../index.html#apps">应用</a>
+          <a id="nav-about" href="../index.html#about">关于</a>
+          <a id="nav-contact" href="./contacts.html">联系</a>
+          <a id="nav-privacy" href="../privacy.html">隐私</a>
+          <a id="nav-terms" href="../terms.html">条款</a>
+          <button id="lang-toggle" class="lang-btn" aria-label="Toggle language">EN</button>
+          <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">☾</button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="policy" style="max-width: 920px; margin: 100px auto 40px; padding: 0 16px;">
+      <p class="crumb"><a href="../index.html#home">← 首页</a></p>
+      <h1 id="contact-title" style="text-align: center;">联系我们</h1>
+      <p id="contact-desc" style="text-align: center;">商务合作与支持，请通过邮箱联系。</p>
+
+      <form id="email-form" class="email-form" onsubmit="return false;" style="margin-top: 16px;">
+        <input type="text" name="_honeypot" id="hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true" />
+        <input type="hidden" id="email-started" name="started" value="" />
+
+        <label for="email-subject" style="display:block;margin:8px 0 4px;">主题</label>
+        <input id="email-subject" type="text" placeholder="邮件标题" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--header-border);" />
+
+        <label for="email-body" style="display:block;margin:12px 0 4px;">内容</label>
+        <textarea id="email-body" rows="6" placeholder="邮件内容" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--header-border);"></textarea>
+
+        <div class="email-actions" style="margin-top:12px;display:flex;gap:10px;">
+          <button class="btn ghost" id="copy-email" type="button" aria-label="复制邮箱地址">复制邮箱</button>
+          <button class="btn" id="email-submit" type="button" aria-label="发送邮件">发送邮件</button>
+        </div>
+        <small id="copy-hint" class="copy-hint" aria-live="polite"></small>
+        <small id="submit-hint" class="copy-hint" aria-live="polite"></small>
+      </form>
+    </main>
+
+    <footer class="site-footer">
+      <p class="footer-links" style="text-align:center;margin:8px 0;">
+        <a id="footer-privacy" href="../privacy.html">隐私</a>
+        · <a id="footer-terms" href="../terms.html">条款</a>
+        · <a id="footer-contact" href="./contacts.html">联系</a>
+      </p>
+      <small>© Eyayoo Studio</small>
+    </footer>
+
+    <script src="../vendor/gsap.min.js" defer></script>
+    <script src="../vendor/ScrollTrigger.min.js" defer></script>
+    <script src="../vendor/lenis.min.js" defer></script>
+    <script src="../script.js" defer></script>
+  </body>
+  </html>
