@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>Eyayoo Studio</title>
+    <meta name="description" content="Small joys, made daily. Crafting delight for all. Eyayoo Studio official site." />
+    <link rel="canonical" href="https://eyayoo.com/" />
+    <link rel="alternate" hreflang="zh-CN" href="https://eyayoo.com/zh/" />
+    <link rel="alternate" hreflang="en" href="https://eyayoo.com/" />
+    <link rel="alternate" hreflang="x-default" href="https://eyayoo.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Eyayoo Studio — Small joys, made daily" />
+    <meta property="og:description" content="Crafting delight for all. Our mobile apps are polished with care." />
+    <meta property="og:url" content="https://eyayoo.com/" />
+    <meta property="og:image" content="https://eyayoo.com/assets/og-default.jpg" />
+    <meta property="og:image" content="https://eyayoo.com/assets/og-default.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://eyayoo.com/assets/og-default.jpg" />
+    <!-- Prevent i18n flash: decide language early and hide until applied -->
+    <script>(function(){try{var p=new URLSearchParams(location.search);var u=p.get('lang');var s=null;try{s=localStorage.getItem('lang')}catch(e){};var d=(document.documentElement.lang||'').toLowerCase().indexOf('zh')===0?'zh':'en';var b=((navigator.languages&&navigator.languages[0])||navigator.language||'').toLowerCase().indexOf('zh')===0?'zh':'en';var lang=u||s||d||b;document.documentElement.setAttribute('data-preset-lang',lang);document.documentElement.lang=(lang==='zh'?'zh-CN':'en');document.documentElement.classList.add('no-i18n-flash');}catch(e){}})();</script>
+    <style>.no-i18n-flash body{visibility:hidden}</style>
+    <link rel="preload" as="font" href="./assets/AlimamaFangYuanTiVF-Thin-2.subset.woff2" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="./styles.css" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav">
+        <button id="menu-toggle" class="menu-btn" aria-label="Open menu" aria-expanded="false">☰</button>
+        <a href="./index.html#home" class="brand">Eyayoo Studio</a>
+        <div class="spacer"></div>
+        <div class="nav-links" id="nav-links">
+          <a id="nav-home" href="#home">Home</a>
+          <a id="nav-products" href="#apps">Apps</a>
+          <a id="nav-about" href="#about">About</a>
+          <a id="nav-contact" href="#contact">Contact</a>
+          <a id="nav-privacy" href="./privacy.html">Privacy</a>
+          <a id="nav-terms" href="./terms.html">Terms</a>
+          <button id="lang-toggle" class="lang-btn" aria-label="Toggle language">EN</button>
+          <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">☾</button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- 全局装饰光球（贯穿多屏移动） -->
+    <div class="global-decor" aria-hidden="true">
+      <div class="gball g1"></div>
+      <div class="gball g2"></div>
+      <div class="gball g3"></div>
+    </div>
+
+    <!-- Scene 1: Hero -->
+    <section class="scene hero" id="home" aria-label="Hero">
+      <div class="pin">
+        <div class="bg"></div>
+        <div class="overlay"></div>
+        <div class="content">
+          <h1 id="hero-title">Small joys, made daily</h1>
+          <p id="hero-sub">Crafting delight for all</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 2: Products (intro + grid) -->
+    <section class="scene products" id="apps" aria-label="Products">
+      <div class="pin">
+        <div class="bg"></div>
+        <div class="content">
+          <h2 id="products-title">Our Products</h2>
+          <p id="products-desc">Mobile apps for everyone, polished with care.</p>
+          <div class="product-grid" id="product-grid">
+            <article class="card" role="link" tabindex="0" aria-label="Open Funny Painting — Enlightenment" data-i="0" data-ios="https://apps.apple.com/us/app/funny-painting-enlightenment/id6478642781" data-android="https://play.google.com/store/apps/details?id=com.eyayoo.gp_paintmaster">
+              <img class="icon" src="./assets/products/funny-painting-enlightenment-ios/icon.png" width="128" height="128" alt="Funny Painting — Enlightenment icon" />
+              <div class="meta">
+                <h3 id="prod1-title">Funny Painting — Enlightenment</h3>
+                <p id="prod1-tag" class="tag">Education / Painting</p>
+                <p id="prod1-desc" class="desc">From simple lines to colors, inspire children’s creativity with offline support and easy sharing.</p>
+              </div>
+            </article>
+            <article class="card" role="link" tabindex="0" aria-label="Open Mahjong Training — Be a Master" data-i="1" data-ios="https://apps.apple.com/us/app/mahjong-training-be-a-master/id6472035775" data-android="https://play.google.com/store/apps/details?id=com.eyayoo.gp_mahjongmaster">
+              <img class="icon" src="./assets/products/mahjong-training-be-a-master-ios/icon.png" width="128" height="128" alt="Mahjong Training — Be a Master icon" />
+              <div class="meta">
+                <h3 id="prod2-title">Mahjong Training — Be a Master</h3>
+                <p id="prod2-tag" class="tag">Puzzle / Training</p>
+                <p id="prod2-desc" class="desc">Improve skills with drills and practice anytime, anywhere. Step onto the path to mastery.</p>
+                <p style="margin-top:8px;"><a href="./mahjong-training.html" id="learn-link" class="learn-link" aria-label="Learn Mahjong rules and training">Learn Mahjong →</a></p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 3: About -->
+    <section class="scene vision" id="about" aria-label="Vision">
+      <div class="pin">
+        <div class="bg"></div>
+        <div class="content narrow">
+          <h2 id="about-title">About Us</h2>
+          <p id="about-desc">Since 2023, what began as one person in a room has grown into a passionate, professional team devoted to making every day more entertaining. The two titles we have released have already welcomed players from the United States, United Kingdom, China, Brazil, Hong Kong, Japan, Belgium, France, and Germany. We pour our hearts into every detail, refining relentlessly to craft distinctive mobile experiences. Our journey never stops, and we are committed to building products that players truly love.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 4: Contact -->
+    <section class="scene contact" id="contact" aria-label="Contact">
+      <div class="pin">
+        <div class="bg"></div>
+        <div class="content narrow">
+          <h2 id="contact-title">Contact Us</h2>
+          <p id="contact-desc">For business and support inquiries, please email us.</p>
+
+          <form id="email-form" class="email-form" onsubmit="return false;">
+            <input type="text" name="_honeypot" id="hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true" />
+            <input type="hidden" id="email-started" name="started" value="" />
+            <input id="email-subject" type="text" placeholder="Email subject" />
+            <textarea id="email-body" rows="6" placeholder="Email message"></textarea>
+            <div class="email-actions">
+              <button class="btn ghost" id="copy-email" type="button" aria-label="Copy email address">Copy Email</button>
+              <button class="btn" id="email-submit" type="button" aria-label="Send email">Send Email</button>
+            </div>
+            <small id="copy-hint" class="copy-hint" aria-live="polite"></small>
+            <small id="submit-hint" class="copy-hint" aria-live="polite"></small>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <p class="footer-links" style="text-align:center;margin:8px 0;">
+        <a id="footer-privacy" href="./privacy.html">Privacy</a>
+        · <a id="footer-terms" href="./terms.html">Terms</a>
+        · <a id="footer-contact" href="./contacts.html">Contact</a>
+      </p>
+      <div class="store-badges">
+        <a href="https://apps.apple.com/us/developer/%E6%8D%B7-%E8%83%A1/id1716308769" aria-label="Download on the App Store" target="_blank" rel="noopener noreferrer"><img id="badge-appstore" src="./assets/Download_on_the_App_Store_Badge.svg" alt="Download on the App Store" loading="lazy" /></a>
+        <a href="https://play.google.com/store/apps/dev?id=8515797961223433505" aria-label="GET IT ON Google Play" target="_blank" rel="noopener noreferrer"><img id="badge-googleplay" src="./assets/Google_Play_Store_badge_EN.svg" alt="GET IT ON Google Play" loading="lazy" /></a>
+      </div>
+      <small>© Eyayoo Studio</small>
+    </footer>
+
+    <!-- Libraries via CDN -->
+    <!-- 本地依赖（如未提供，将自动使用原生动画降级方案） -->
+    <script src="./vendor/gsap.min.js" defer></script>
+    <script src="./vendor/ScrollTrigger.min.js" defer></script>
+    <script src="./vendor/lenis.min.js" defer></script>
+    <script src="./script.js" defer></script>
+  </body>
+  </html>

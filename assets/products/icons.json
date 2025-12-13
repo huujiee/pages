@@ -1,0 +1,18 @@
+[
+  {
+    "url": "https://play.google.com/store/apps/details?id=com.eyayoo.gp_paintmaster",
+    "icon": "assets/products/gp_paintmaster-android/icon.png"
+  },
+  {
+    "url": "https://apps.apple.com/us/app/funny-painting-enlightenment/id6478642781",
+    "icon": "assets/products/funny-painting-enlightenment-ios/icon.png"
+  },
+  {
+    "url": "https://play.google.com/store/apps/details?id=com.eyayoo.gp_mahjongmaster",
+    "icon": "assets/products/gp_mahjongmaster-android/icon.png"
+  },
+  {
+    "url": "https://apps.apple.com/us/app/mahjong-training-be-a-master/id6472035775",
+    "icon": "assets/products/mahjong-training-be-a-master-ios/icon.png"
+  }
+]
