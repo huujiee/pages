@@ -3,6 +3,7 @@
   --bg: #fff0e6; /* 统一背景色（浅桃） */
   --fg: #201a2d;
   --muted: #6b5e7a;
+  --legal-link: #075db6;
   --brand: #ff6ea7; /* 樱桃粉 */
   --brand-2: #39c7bd; /* 薄荷青（更饱和） */
   --brand-3: #ffcf57; /* 奶油黄（偏金） */
@@ -19,6 +20,7 @@
   --bg: #fff0e6;
   --fg: #201a2d;
   --muted: #6b5e7a;
+  --legal-link: #075db6;
   --brand: #ff6ea7;
   --brand-2: #39c7bd;
   --brand-3: #ffcf57;
@@ -34,6 +36,7 @@
     --bg: #121017; /* 统一深背景 */
     --fg: #f3eef8;
     --muted: #b6adc8;
+    --legal-link: #8ec7ff;
     --brand: #ff7fb6;
     --brand-2: #44d8cd;
     --brand-3: #ffd874;
@@ -49,6 +52,7 @@
   --bg: #121017;
   --fg: #f3eef8;
   --muted: #b6adc8;
+  --legal-link: #8ec7ff;
   --brand: #ff7fb6;
   --brand-2: #44d8cd;
   --brand-3: #ffd874;
@@ -233,15 +237,71 @@ h1, h2 {
   font-weight: 700;
 }
 
-/* 首屏文案：微调垂直位置至更居中 */
+/* Quiet editorial typography balances the rounded brand mark. */
+.hero .pin { padding: 6rem 1.5rem 5rem; }
+.hero .content { max-width: 56rem; margin-top: -2svh; }
+.hero-copy {
+  font-family: "Avenir Next", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+.hero #hero-title {
+  margin: 0 0 1.5rem;
+  font-size: clamp(2.75rem, 6vw, 4.25rem);
+  font-weight: 700;
+  letter-spacing: normal;
+  line-height: 1.06;
+  white-space: normal;
+}
+@media (max-width: 600px) {
+  .hero #hero-title { white-space: pre-line; }
+}
+.hero:lang(zh) #hero-title {
+  font-size: clamp(2.5rem, 6.8vw, 5rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.hero #hero-sub {
+  max-width: 29rem;
+  font-size: clamp(1rem, 1.4vw, 1.125rem);
+  line-height: 1.75;
+  text-wrap: balance;
+}
+.hero:lang(zh) #hero-sub { max-width: 23em; white-space: pre-line; }
+.hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 44px;
+  margin-top: 2rem;
+  padding: .5rem 0;
+  border-bottom: 1px solid currentColor;
+  color: var(--fg);
+  font-size: .9375rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+.hero-link-arrow { transition: transform .2s ease; }
+.hero-link:hover .hero-link-arrow { transform: translateX(4px); }
+.hero-link:focus-visible { outline: 2px solid var(--brand-2); outline-offset: 6px; border-radius: 2px; }
 
-.hero .content h1 { margin-bottom: 18px; }
+/* Animate the complete copy, never its contents or measured layout. */
+:root.js:not(.no-i18n-flash)[data-animation-mode="gsap"] .hero-copy,
+:root.js:not(.no-i18n-flash)[data-animation-mode="native"] .hero-copy {
+  animation: hero-arrive .8s cubic-bezier(.22, 1, .36, 1) both;
+}
+@keyframes hero-arrive {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-copy { animation: none !important; }
+  .hero-link-arrow { transition: none; }
+}
 
 /* 联系页内容轻微上移，拉近与上一屏距离 */
 .contact .content { margin-top: -2vh; }
 
 /* 首屏与后续屏的文字在滚动时有缩放/字距变化的基础设置 */
-.hero .content h1, .hero .content p,
 .products .content h2, .products .content p,
 .vision .content h2, .vision .content p { transform-origin: center; will-change: transform, letter-spacing; }
 
@@ -268,8 +328,8 @@ h1, h2 {
 
 /* 趣味装饰元素（全局光球） */
 .decor { position: absolute; border-radius: 999px; filter: blur(24px); opacity: .5; z-index: 1; }
-.global-decor { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
-.gball { position: absolute; width: 200px; height: 200px; border-radius: 50%; filter: blur(20px) saturate(120%); opacity: 0; will-change: transform; mix-blend-mode: screen; }
+.global-decor { position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: .45; }
+.gball { position: absolute; width: clamp(220px, 28vw, 400px); height: clamp(220px, 28vw, 400px); border-radius: 50%; filter: blur(36px) saturate(65%); opacity: 0; will-change: transform; mix-blend-mode: screen; }
 .gball.g1 { background: radial-gradient(circle at 30% 30%, var(--brand), rgba(255,105,180,0.4), transparent 70%); }
 .gball.g2 { background: radial-gradient(circle at 60% 40%, var(--brand-2), rgba(90,209,201,0.4), transparent 70%); }
 .gball.g3 { background: radial-gradient(circle at 50% 50%, var(--brand-3), rgba(255,207,87,0.35), transparent 70%); }
@@ -278,7 +338,7 @@ h1, h2 {
 /* 产品网格 */
 .scene.products .content { max-width: 1100px; }
 .scene.products .content h2,
-.scene.products .content p {
+.scene.products .content > p {
   opacity: 0;
   transform: translateY(60px);
   will-change: transform, opacity, letter-spacing;
@@ -298,55 +358,35 @@ h1, h2 {
   letter-spacing: 0;      /* <--- 关键修改：强制改为 0 或 normal */
   will-change: transform, opacity; /* 移除 letter-spacing 的性能优化提示 */
 }
-.product-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  margin-top: 20px;
-}
+/* Product stories: copy and an uncropped, real store screenshot. */
+.product-grid { display: grid; gap: 24px; margin-top: 32px; }
+.products .content { width: 100%; }
 .card {
-  background: var(--card-bg);
-  border-radius: 20px;
-  padding: 16px;
-  text-align: left;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.08);
-  /* transition removed to allow GSAP control */
-  cursor: pointer;
   display: grid;
-  grid-template-columns: 128px 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px;
   align-items: center;
+  padding: 28px;
+  background: var(--card-bg);
+  color: var(--card-fg);
+  border: 1px solid var(--header-border);
+  border-radius: 24px;
+  text-align: left;
+  box-shadow: 0 10px 24px rgba(0,0,0,.06);
 }
-.card h3, .card .desc { color: var(--card-fg); }
-.card .icon { display: block; margin: 0 auto; border-radius: 22%; box-shadow: 0 6px 14px rgba(0,0,0,.12); }
-.card .meta { padding: 0 8px 0 16px; }
-.card h3 { margin: 2px 0 6px; font-size: 20px; font-weight: 800; }
-.card .tag { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
-.card .desc { margin: 0; opacity: .95; font-size: 14px; line-height: 1.6; }
-
-@media (prefers-color-scheme: dark) {
-  .card { box-shadow: 0 8px 18px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.06); }
-}
-.card:hover {
-  /* 改为子元素平滑过渡，避免与 GSAP 的 transform 冲突 */
-  box-shadow: 0 14px 32px rgba(0,0,0,0.12);
-}
-/* 平滑悬停：仅对子元素做位移/缩放，避免覆盖父级 transform */
-.card .icon,
-.card .meta { transition: transform .18s ease; }
-.card:hover .icon { transform: translateY(-4px) scale(1.06); }
-.card:hover .meta { transform: translateY(-2px); }
-.badges { display: flex; gap: 8px; justify-content: center; }
-.store-badge {
-  display: inline-block; padding: 8px 10px; border-radius: 12px; font-weight: 700; text-decoration: none;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-}
-.store-badge.ios { background: var(--brand-2); color: #103c3a; }
-.store-badge.gp { background: var(--brand); color: #4c0f26; }
-
-/* 小屏也尽量两列显示 */
-@media (max-width: 520px) {
-  .card { grid-template-columns: 1fr; text-align: center; }
-  .card .meta { padding: 10px 0 0; }
+.card .meta { min-width: 0; }
+.card .icon { display: block; width: 56px; height: 56px; border-radius: 22%; margin-bottom: 14px; }
+.card h3 { margin: 0 0 6px; font-size: 24px; line-height: 1.25; }
+.card .tag { margin: 0 0 14px; color: var(--card-fg); font-size: 15px; font-weight: 600; }
+.card .desc { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.7; }
+.product-preview { display: block; width: 100%; height: auto; border-radius: 14px; border: 1px solid var(--header-border); }
+.product-downloads { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.product-downloads a { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding: 8px 14px; border: 1px solid currentColor; border-radius: 10px; color: var(--card-fg); font-size: 14px; text-decoration: none; }
+.product-downloads a:hover { color: var(--muted); }
+.product-downloads a:focus-visible { outline: 3px solid var(--brand-2); outline-offset: 4px; }
+@media (max-width: 700px) {
+  .card { grid-template-columns: minmax(0, 1fr); padding: 20px; gap: 24px; }
+  .card h3 { font-size: 22px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -418,3 +458,51 @@ h1, h2 {
   will-change: transform, opacity; /* 移除 letter-spacing 优化提示 */
 }
 /* Editor overlay — removed */
+
+/* Inherit the site's reading surface and text so an App reader can also
+   supply its own body colors without a separate document background. */
+main.policy[data-legal-page] {
+  width: 100%;
+  max-width: 760px;
+  margin: 104px auto 48px;
+  padding: 32px 24px 48px;
+  background: transparent;
+  color: inherit;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+main.policy[data-legal-page] [hidden] { display: none !important; }
+main.policy[data-legal-page] h1,
+main.policy[data-legal-page] h2,
+main.policy[data-legal-page] h3 { font-family: inherit; }
+main.policy[data-legal-page] h1 {
+  margin: 0 0 16px;
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+}
+main.policy[data-legal-page] h2 {
+  margin: 36px 0 12px;
+  font-size: 21px;
+  font-weight: 650;
+  line-height: 1.45;
+}
+main.policy[data-legal-page] h3 { margin: 24px 0 8px; font-size: 18px; line-height: 1.5; }
+main.policy[data-legal-page] [data-legal-anchor] { scroll-margin-top: 96px; }
+main.policy[data-legal-page] p { margin: 0 0 16px; color: inherit; }
+main.policy[data-legal-page] ul,
+main.policy[data-legal-page] ol { margin: 12px 0 20px; padding-left: 24px; }
+main.policy[data-legal-page] li { margin: 8px 0; color: inherit; }
+main.policy[data-legal-page] a { color: var(--legal-link); text-underline-offset: 3px; overflow-wrap: anywhere; }
+main.policy[data-legal-page] a:hover { text-decoration-thickness: 2px; }
+main.policy[data-legal-page] a:focus-visible { outline: 3px solid currentColor; outline-offset: 4px; border-radius: 3px; }
+main.policy[data-legal-page] .policy-date,
+main.policy[data-legal-page] .policy-updated { color: var(--muted); font-size: 14px; }
+main.policy[data-legal-page] .policy-related { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--header-border); }
+@media (max-width: 600px) {
+  main.policy[data-legal-page] { margin: 88px auto 24px; padding: 28px 20px 36px; }
+  main.policy[data-legal-page] h2 { margin-top: 30px; font-size: 20px; }
+}

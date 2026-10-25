@@ -1,18 +1,42 @@
 [
   {
-    "url": "https://play.google.com/store/apps/details?id=com.eyayoo.gp_paintmaster",
-    "icon": "assets/products/gp_paintmaster-android/icon.png"
-  },
-  {
+    "productId": "painting",
+    "platform": "ios",
+    "storeName": "Funny Painting - Enlightenment",
     "url": "https://apps.apple.com/us/app/funny-painting-enlightenment/id6478642781",
-    "icon": "assets/products/funny-painting-enlightenment-ios/icon.png"
+    "icon": "assets/products/funny-painting-enlightenment-ios/icon.png",
+    "availability": "available",
+    "verifiedAt": "2026-07-20",
+    "verificationLocale": "en-US"
   },
   {
-    "url": "https://play.google.com/store/apps/details?id=com.eyayoo.gp_mahjongmaster",
-    "icon": "assets/products/gp_mahjongmaster-android/icon.png"
+    "productId": "painting",
+    "platform": "android",
+    "storeName": "Creative Painting - Kids Game",
+    "url": "https://play.google.com/store/apps/details?id=com.eyayoo.gp_paintmaster",
+    "icon": "assets/products/gp_paintmaster-android/icon.png",
+    "availability": "available",
+    "verifiedAt": "2026-07-20",
+    "verificationLocale": "en-US"
   },
   {
+    "productId": "mahjong",
+    "platform": "ios",
+    "storeName": "Mahjong Training - Be a Master",
     "url": "https://apps.apple.com/us/app/mahjong-training-be-a-master/id6472035775",
-    "icon": "assets/products/mahjong-training-be-a-master-ios/icon.png"
+    "icon": "assets/products/mahjong-training-be-a-master-ios/icon.png",
+    "availability": "available",
+    "verifiedAt": "2026-07-20",
+    "verificationLocale": "en-US"
+  },
+  {
+    "productId": "mahjong",
+    "platform": "android",
+    "storeName": "Mahjong Training: WinningRules",
+    "url": "https://play.google.com/store/apps/details?id=com.eyayoo.gp_mahjongmaster",
+    "icon": "assets/products/gp_mahjongmaster-android/icon.png",
+    "availability": "available",
+    "verifiedAt": "2026-07-20",
+    "verificationLocale": "en-US"
   }
 ]

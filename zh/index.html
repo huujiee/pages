@@ -7,21 +7,23 @@
     <meta name="description" content="小小欢喜，每天发生。为每个日常时刻而作。Eyayoo Studio 官方站点。" />
     <link rel="canonical" href="https://eyayoo.com/zh/" />
     <link rel="alternate" hreflang="zh-CN" href="https://eyayoo.com/zh/" />
-    <link rel="alternate" hreflang="en" href="https://eyayoo.com/" />
+    <link rel="alternate" hreflang="en" href="https://eyayoo.com/en/" />
     <link rel="alternate" hreflang="x-default" href="https://eyayoo.com/" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Eyayoo Studio — 小小欢喜，每天发生" />
     <meta property="og:description" content="为每个日常时刻而作。我们的移动应用持续打磨体验与品质。" />
     <meta property="og:url" content="https://eyayoo.com/zh/" />
     <meta property="og:image" content="https://eyayoo.com/assets/og-default.jpg" />
-    <meta property="og:image" content="https://eyayoo.com/assets/og-default.svg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://eyayoo.com/assets/og-default.jpg" />
     <!-- Prevent i18n flash: decide language early and hide until applied -->
     <script>(function(){try{var p=new URLSearchParams(location.search);var u=p.get('lang');var s=null;try{s=localStorage.getItem('lang')}catch(e){};var d=(document.documentElement.lang||'').toLowerCase().indexOf('zh')===0?'zh':'en';var b=((navigator.languages&&navigator.languages[0])||navigator.language||'').toLowerCase().indexOf('zh')===0?'zh':'en';var lang='zh';document.documentElement.setAttribute('data-preset-lang',lang);document.documentElement.lang=(lang==='zh'?'zh-CN':'en');document.documentElement.classList.add('no-i18n-flash');}catch(e){}})();</script>
     <style>.no-i18n-flash body{visibility:hidden}</style>
     <link rel="preload" as="font" href="../assets/AlimamaFangYuanTiVF-Thin-2.subset.woff2" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../styles.css?v=71319f53a6f0" />
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
   </head>
@@ -36,8 +38,8 @@
           <a id="nav-products" href="#apps">应用</a>
           <a id="nav-about" href="#about">关于</a>
           <a id="nav-contact" href="#contact">联系</a>
-          <a id="nav-privacy" href="../privacy.html">隐私</a>
-          <a id="nav-terms" href="../terms.html">条款</a>
+          <a id="nav-privacy" href="./privacy.html">隐私</a>
+          <a id="nav-terms" href="./terms.html">条款</a>
           <button id="lang-toggle" class="lang-btn" aria-label="Toggle language">EN</button>
           <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme">☾</button>
         </div>
@@ -57,8 +59,14 @@
         <div class="bg"></div>
         <div class="overlay"></div>
         <div class="content">
-          <h1 id="hero-title">小小欢喜，每天发生</h1>
-          <p id="hero-sub">为每个日常时刻而作</p>
+          <div class="hero-copy">
+            <h1 id="hero-title">小小欢喜&#10;每天发生</h1>
+            <p id="hero-sub">独立制作的应用，&#10;陪你创作、学习与玩乐。</p>
+            <a id="hero-work-link" class="hero-link" href="#apps">
+              <span id="hero-cta">查看作品</span>
+              <span class="hero-link-arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -71,22 +79,31 @@
           <h2 id="products-title">我们的产品</h2>
           <p id="products-desc">面向全球用户的移动应用，持续打磨体验与品质。</p>
           <div class="product-grid" id="product-grid">
-            <article class="card" role="link" tabindex="0" aria-label="Open Funny Painting — Enlightenment" data-i="0" data-ios="https://apps.apple.com/us/app/funny-painting-enlightenment/id6478642781" data-android="https://play.google.com/store/apps/details?id=com.eyayoo.gp_paintmaster">
-              <img class="icon" src="../assets/products/funny-painting-enlightenment-ios/icon.png" width="128" height="128" alt="儿童奇妙绘画馆 - 绘画启蒙 图标" />
+            <article class="card" data-i="0" data-product-id="painting" data-ios="https://apps.apple.com/us/app/funny-painting-enlightenment/id6478642781" data-ios-name="Funny Painting - Enlightenment" data-ios-icon="../assets/products/funny-painting-enlightenment-ios/icon.png" data-android="https://play.google.com/store/apps/details?id=com.eyayoo.gp_paintmaster" data-android-name="Creative Painting - Kids Game" data-android-icon="../assets/products/gp_paintmaster-android/icon.png">
               <div class="meta">
-                <h3 id="prod1-title">儿童奇妙绘画馆 - 绘画启蒙</h3>
-                <p id="prod1-tag" class="tag">教育 / 绘画启蒙</p>
-                <p id="prod1-desc" class="desc">从简单线条到色彩搭配，帮助儿童快乐启蒙与创意表达，支持离线创作与家长共享。</p>
+                <img class="icon" src="../assets/products/funny-painting-enlightenment-ios/icon.png" width="128" height="128" alt="儿童创意绘画图标" />
+                <h3 id="prod1-title">儿童创意绘画</h3>
+                <p id="prod1-tag" class="tag">给小小创作者的绘画天地</p>
+                <p id="prod1-desc" class="desc">在涂涂画画和趣味活动中探索色彩，把脑海里的想象变成自己的作品。</p>
+                <div class="product-downloads">
+                  <a href="https://apps.apple.com/us/app/funny-painting-enlightenment/id6478642781" target="_blank" rel="noopener noreferrer">App Store <span aria-hidden="true">↗</span></a>
+                  <a href="https://play.google.com/store/apps/details?id=com.eyayoo.gp_paintmaster" target="_blank" rel="noopener noreferrer">Google Play <span aria-hidden="true">↗</span></a>
+                </div>
               </div>
+              <img class="product-preview" src="../assets/products/funny-painting-enlightenment-ios/preview.jpg" width="960" height="540" alt="Funny Painting drawing canvas with colorful pencils" loading="lazy" />
             </article>
-            <article class="card" role="link" tabindex="0" aria-label="Open Mahjong Training — Be a Master" data-i="1" data-ios="https://apps.apple.com/us/app/mahjong-training-be-a-master/id6472035775" data-android="https://play.google.com/store/apps/details?id=com.eyayoo.gp_mahjongmaster">
-              <img class="icon" src="../assets/products/mahjong-training-be-a-master-ios/icon.png" width="128" height="128" alt="麻将训练 - 大师之路 图标" />
+            <article class="card" data-i="1" data-product-id="mahjong" data-ios="https://apps.apple.com/us/app/mahjong-training-be-a-master/id6472035775" data-ios-name="Mahjong Training - Be a Master" data-ios-icon="../assets/products/mahjong-training-be-a-master-ios/icon.png" data-android="https://play.google.com/store/apps/details?id=com.eyayoo.gp_mahjongmaster" data-android-name="Mahjong Training: WinningRules" data-android-icon="../assets/products/gp_mahjongmaster-android/icon.png">
               <div class="meta">
-                <h3 id="prod2-title">麻将训练 - 大师之路</h3>
-                <p id="prod2-tag" class="tag">益智 / 训练</p>
-                <p id="prod2-desc" class="desc">通过专项训练与实战练习提升麻将技巧，随时随地巩固牌技，助你迈向大师之路。</p>
-                <p style="margin-top:8px;"><a href="./mahjong-training.html" id="learn-link" class="learn-link" aria-label="Learn Mahjong rules and training">学习麻将 →</a></p>
+                <img class="icon" src="../assets/products/mahjong-training-be-a-master-ios/icon.png" width="128" height="128" alt="麻将训练图标" />
+                <h3 id="prod2-title">麻将训练</h3>
+                <p id="prod2-tag" class="tag">从认识规则，到练习胡牌判断</p>
+                <p id="prod2-desc" class="desc">通过由浅入深的练习熟悉麻将规则，在一道道题目中逐步建立判断能力。</p>
+                <div class="product-downloads">
+                  <a href="https://apps.apple.com/us/app/mahjong-training-be-a-master/id6472035775" target="_blank" rel="noopener noreferrer">App Store <span aria-hidden="true">↗</span></a>
+                  <a href="https://play.google.com/store/apps/details?id=com.eyayoo.gp_mahjongmaster" target="_blank" rel="noopener noreferrer">Google Play <span aria-hidden="true">↗</span></a>
+                </div>
               </div>
+              <img class="product-preview" src="../assets/products/mahjong-training-be-a-master-ios/preview.jpg" width="960" height="540" alt="Mahjong Training winning-hand practice screen" loading="lazy" />
             </article>
           </div>
         </div>
@@ -99,7 +116,7 @@
         <div class="bg"></div>
         <div class="content narrow">
           <h2 id="about-title">关于我们</h2>
-          <p id="about-desc">自 2023 年起，我们从一人起步，成长为一支热忱且专业的团队，致力于让每天都更有趣。目前发布的两款产品收获了来自美国、英国、中国、巴西、香港、日本、比利时、法国、德国等地区玩家的下载与支持。我们专注每一个细节，持续打磨，力求打造独特的移动体验；旅程不会停下，始终以创造被玩家真心喜爱的产品为目标。</p>
+          <p id="about-desc">Eyayoo Studio 自 2023 年起持续打造移动应用。目前公开发布的两款产品分别聚焦儿童创意绘画与麻将学习训练。我们重视清晰易用的体验，并持续完善产品内容。</p>
         </div>
       </div>
     </section>
@@ -112,14 +129,14 @@
           <h2 id="contact-title">联系我们</h2>
           <p id="contact-desc">商务合作与支持，请通过邮箱联系。</p>
 
-          <form id="email-form" class="email-form" onsubmit="return false;">
+          <form id="email-form" class="email-form">
             <input type="text" name="_honeypot" id="hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true" />
             <input type="hidden" id="email-started" name="started" value="" />
-            <input id="email-subject" type="text" placeholder="邮件标题" />
-            <textarea id="email-body" rows="6" placeholder="邮件内容"></textarea>
+            <input id="email-subject" name="subject" type="text" placeholder="邮件标题" />
+            <textarea id="email-body" name="message" rows="6" placeholder="邮件内容"></textarea>
             <div class="email-actions">
-              <button class="btn ghost" id="copy-email" type="button" aria-label="Copy email address">复制邮箱</button>
-              <button class="btn" id="email-submit" type="button" aria-label="Send email">发送邮件</button>
+              <button class="btn ghost" id="copy-email" type="button" aria-label="复制邮箱">复制邮箱</button>
+              <button class="btn" id="email-submit" type="submit" aria-label="发送邮件">发送邮件</button>
             </div>
             <small id="copy-hint" class="copy-hint" aria-live="polite"></small>
             <small id="submit-hint" class="copy-hint" aria-live="polite"></small>
@@ -130,8 +147,8 @@
 
     <footer class="site-footer">
       <p class="footer-links" style="text-align:center;margin:8px 0;">
-        <a id="footer-privacy" href="../privacy.html">Privacy</a>
-        · <a id="footer-terms" href="../terms.html">Terms</a>
+        <a id="footer-privacy" href="./privacy.html">隐私</a>
+        · <a id="footer-terms" href="./terms.html">条款</a>
         · <a id="footer-contact" href="./contacts.html">联系</a>
       </p>
       <div class="store-badges">
@@ -146,6 +163,7 @@
     <script src="../vendor/gsap.min.js" defer></script>
     <script src="../vendor/ScrollTrigger.min.js" defer></script>
     <script src="../vendor/lenis.min.js" defer></script>
-    <script src="../script.js" defer></script>
+    <script src="../form-config.js?v=c881c472285c"></script>
+    <script src="../script.js?v=673a0e1f7f8c" defer></script>
   </body>
   </html>

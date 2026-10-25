@@ -7,21 +7,23 @@
     <meta name="description" content="Small joys, made daily. Crafting delight for all. Eyayoo Studio official site." />
     <link rel="canonical" href="https://eyayoo.com/" />
     <link rel="alternate" hreflang="zh-CN" href="https://eyayoo.com/zh/" />
-    <link rel="alternate" hreflang="en" href="https://eyayoo.com/" />
+    <link rel="alternate" hreflang="en" href="https://eyayoo.com/en/" />
     <link rel="alternate" hreflang="x-default" href="https://eyayoo.com/" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Eyayoo Studio — Small joys, made daily" />
     <meta property="og:description" content="Crafting delight for all. Our mobile apps are polished with care." />
     <meta property="og:url" content="https://eyayoo.com/" />
     <meta property="og:image" content="https://eyayoo.com/assets/og-default.jpg" />
-    <meta property="og:image" content="https://eyayoo.com/assets/og-default.svg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://eyayoo.com/assets/og-default.jpg" />
     <!-- Prevent i18n flash: decide language early and hide until applied -->
     <script>(function(){try{var p=new URLSearchParams(location.search);var u=p.get('lang');var s=null;try{s=localStorage.getItem('lang')}catch(e){};var d=(document.documentElement.lang||'').toLowerCase().indexOf('zh')===0?'zh':'en';var b=((navigator.languages&&navigator.languages[0])||navigator.language||'').toLowerCase().indexOf('zh')===0?'zh':'en';var lang=u||s||d||b;document.documentElement.setAttribute('data-preset-lang',lang);document.documentElement.lang=(lang==='zh'?'zh-CN':'en');document.documentElement.classList.add('no-i18n-flash');}catch(e){}})();</script>
     <style>.no-i18n-flash body{visibility:hidden}</style>
     <link rel="preload" as="font" href="./assets/AlimamaFangYuanTiVF-Thin-2.subset.woff2" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=71319f53a6f0" />
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
   </head>
@@ -57,8 +59,14 @@
         <div class="bg"></div>
         <div class="overlay"></div>
         <div class="content">
-          <h1 id="hero-title">Small joys, made daily</h1>
-          <p id="hero-sub">Crafting delight for all</p>
+          <div class="hero-copy">
+            <h1 id="hero-title">Small joys&#10;made daily</h1>
+            <p id="hero-sub">Independent apps for creativity, learning, and play.</p>
+            <a id="hero-work-link" class="hero-link" href="#apps">
+              <span id="hero-cta">View our apps</span>
+              <span class="hero-link-arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -71,22 +79,31 @@
           <h2 id="products-title">Our Products</h2>
           <p id="products-desc">Mobile apps for everyone, polished with care.</p>
           <div class="product-grid" id="product-grid">
-            <article class="card" role="link" tabindex="0" aria-label="Open Funny Painting — Enlightenment" data-i="0" data-ios="https://apps.apple.com/us/app/funny-painting-enlightenment/id6478642781" data-android="https://play.google.com/store/apps/details?id=com.eyayoo.gp_paintmaster">
-              <img class="icon" src="./assets/products/funny-painting-enlightenment-ios/icon.png" width="128" height="128" alt="Funny Painting — Enlightenment icon" />
+            <article class="card" data-i="0" data-product-id="painting" data-ios="https://apps.apple.com/us/app/funny-painting-enlightenment/id6478642781" data-ios-name="Funny Painting - Enlightenment" data-ios-icon="./assets/products/funny-painting-enlightenment-ios/icon.png" data-android="https://play.google.com/store/apps/details?id=com.eyayoo.gp_paintmaster" data-android-name="Creative Painting - Kids Game" data-android-icon="./assets/products/gp_paintmaster-android/icon.png">
               <div class="meta">
-                <h3 id="prod1-title">Funny Painting — Enlightenment</h3>
-                <p id="prod1-tag" class="tag">Education / Painting</p>
-                <p id="prod1-desc" class="desc">From simple lines to colors, inspire children’s creativity with offline support and easy sharing.</p>
+                <img class="icon" src="./assets/products/funny-painting-enlightenment-ios/icon.png" width="128" height="128" alt="Funny Painting — Enlightenment icon" />
+                <h3 id="prod1-title">Funny Painting</h3>
+                <p id="prod1-tag" class="tag">A creative playground for little artists</p>
+                <p id="prod1-desc" class="desc">Explore colors through drawing and playful activities. Turn everyday imagination into artwork of your own.</p>
+                <div class="product-downloads">
+                  <a href="https://apps.apple.com/us/app/funny-painting-enlightenment/id6478642781" target="_blank" rel="noopener noreferrer">App Store <span aria-hidden="true">↗</span></a>
+                  <a href="https://play.google.com/store/apps/details?id=com.eyayoo.gp_paintmaster" target="_blank" rel="noopener noreferrer">Google Play <span aria-hidden="true">↗</span></a>
+                </div>
               </div>
+              <img class="product-preview" src="./assets/products/funny-painting-enlightenment-ios/preview.jpg" width="960" height="540" alt="Funny Painting drawing canvas with colorful pencils" loading="lazy" />
             </article>
-            <article class="card" role="link" tabindex="0" aria-label="Open Mahjong Training — Be a Master" data-i="1" data-ios="https://apps.apple.com/us/app/mahjong-training-be-a-master/id6472035775" data-android="https://play.google.com/store/apps/details?id=com.eyayoo.gp_mahjongmaster">
-              <img class="icon" src="./assets/products/mahjong-training-be-a-master-ios/icon.png" width="128" height="128" alt="Mahjong Training — Be a Master icon" />
+            <article class="card" data-i="1" data-product-id="mahjong" data-ios="https://apps.apple.com/us/app/mahjong-training-be-a-master/id6472035775" data-ios-name="Mahjong Training - Be a Master" data-ios-icon="./assets/products/mahjong-training-be-a-master-ios/icon.png" data-android="https://play.google.com/store/apps/details?id=com.eyayoo.gp_mahjongmaster" data-android-name="Mahjong Training: WinningRules" data-android-icon="./assets/products/gp_mahjongmaster-android/icon.png">
               <div class="meta">
-                <h3 id="prod2-title">Mahjong Training — Be a Master</h3>
-                <p id="prod2-tag" class="tag">Puzzle / Training</p>
-                <p id="prod2-desc" class="desc">Improve skills with drills and practice anytime, anywhere. Step onto the path to mastery.</p>
-                <p style="margin-top:8px;"><a href="./mahjong-training.html" id="learn-link" class="learn-link" aria-label="Learn Mahjong rules and training">Learn Mahjong →</a></p>
+                <img class="icon" src="./assets/products/mahjong-training-be-a-master-ios/icon.png" width="128" height="128" alt="Mahjong Training — Be a Master icon" />
+                <h3 id="prod2-title">Mahjong Training</h3>
+                <p id="prod2-tag" class="tag">Learn the rules. Build your judgment.</p>
+                <p id="prod2-desc" class="desc">Get to know mahjong through step-by-step practice. Build your winning-hand judgment, one challenge at a time.</p>
+                <div class="product-downloads">
+                  <a href="https://apps.apple.com/us/app/mahjong-training-be-a-master/id6472035775" target="_blank" rel="noopener noreferrer">App Store <span aria-hidden="true">↗</span></a>
+                  <a href="https://play.google.com/store/apps/details?id=com.eyayoo.gp_mahjongmaster" target="_blank" rel="noopener noreferrer">Google Play <span aria-hidden="true">↗</span></a>
+                </div>
               </div>
+              <img class="product-preview" src="./assets/products/mahjong-training-be-a-master-ios/preview.jpg" width="960" height="540" alt="Mahjong Training winning-hand practice screen" loading="lazy" />
             </article>
           </div>
         </div>
@@ -99,7 +116,7 @@
         <div class="bg"></div>
         <div class="content narrow">
           <h2 id="about-title">About Us</h2>
-          <p id="about-desc">Since 2023, what began as one person in a room has grown into a passionate, professional team devoted to making every day more entertaining. The two titles we have released have already welcomed players from the United States, United Kingdom, China, Brazil, Hong Kong, Japan, Belgium, France, and Germany. We pour our hearts into every detail, refining relentlessly to craft distinctive mobile experiences. Our journey never stops, and we are committed to building products that players truly love.</p>
+          <p id="about-desc">Eyayoo Studio has been creating mobile experiences since 2023. Our two published apps focus on children's creative drawing and practical mahjong learning. We keep refining each product with clear, approachable design and thoughtful updates.</p>
         </div>
       </div>
     </section>
@@ -112,14 +129,14 @@
           <h2 id="contact-title">Contact Us</h2>
           <p id="contact-desc">For business and support inquiries, please email us.</p>
 
-          <form id="email-form" class="email-form" onsubmit="return false;">
+          <form id="email-form" class="email-form">
             <input type="text" name="_honeypot" id="hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;" aria-hidden="true" />
             <input type="hidden" id="email-started" name="started" value="" />
-            <input id="email-subject" type="text" placeholder="Email subject" />
-            <textarea id="email-body" rows="6" placeholder="Email message"></textarea>
+            <input id="email-subject" name="subject" type="text" placeholder="Email subject" />
+            <textarea id="email-body" name="message" rows="6" placeholder="Email message"></textarea>
             <div class="email-actions">
               <button class="btn ghost" id="copy-email" type="button" aria-label="Copy email address">Copy Email</button>
-              <button class="btn" id="email-submit" type="button" aria-label="Send email">Send Email</button>
+              <button class="btn" id="email-submit" type="submit" aria-label="Send email">Send Email</button>
             </div>
             <small id="copy-hint" class="copy-hint" aria-live="polite"></small>
             <small id="submit-hint" class="copy-hint" aria-live="polite"></small>
@@ -146,6 +163,7 @@
     <script src="./vendor/gsap.min.js" defer></script>
     <script src="./vendor/ScrollTrigger.min.js" defer></script>
     <script src="./vendor/lenis.min.js" defer></script>
-    <script src="./script.js" defer></script>
+    <script src="./form-config.js?v=c881c472285c"></script>
+    <script src="./script.js?v=673a0e1f7f8c" defer></script>
   </body>
   </html>

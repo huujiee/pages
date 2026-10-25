@@ -1,61 +1,59 @@
-# 本地动画库（可选）
+# 本地浏览器依赖与可选配置
 
-本原型已内置“原生滚动动画”降级实现，无需外部库即可工作。
-若你需要更强的时间轴与控制，可在本地放置以下文件（无需联网）：
+站点已将浏览器运行所需的库提交到 `vendor/`，发布页面不依赖 CDN：
 
-- gsap.min.js（GSAP 3.x）
-- ScrollTrigger.min.js（GSAP 插件）
-- lenis.min.js（可选：平滑滚动）
+- `gsap.min.js`：GSAP 3.12.2
+- `ScrollTrigger.min.js`：ScrollTrigger 3.12.2
+- `lenis.min.js`：可选平滑滚动运行库
 
-放置路径
-- vendor/gsap.min.js
-- vendor/ScrollTrigger.min.js
-- vendor/lenis.min.js
+更新这些文件时必须同时核对许可证、浏览器兼容性、文件完整性和现有动画验收结果。不要在构建阶段从网络临时下载不同版本。
 
-获取方式（任一）：
-- 从官方或 CDN 手动下载对应文件并复制到上述路径：
-  - https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js
-  - https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js
-  - https://unpkg.com/@studio-freight/lenis/bundled/lenis.min.js
-- 或通过现有项目依赖 node_modules 复制同名文件
+## 动画执行路径
 
-启用方式
-- index.html 已按顺序引用 vendor 下的文件；若文件存在，脚本会检测并优先使用 GSAP/ScrollTrigger；
-- 若文件不存在，则自动使用原生降级动画（已默认启用）。
+| 条件 | 结果 |
+|---|---|
+| 正常、GSAP 与 ScrollTrigger 可用 | GSAP 时间轴与 ScrollTrigger |
+| 依赖不可用或 `?animation=native` | 原生动画降级 |
+| 系统减少动效或 `?animation=reduced` | 静态内容，停用复杂动画 |
+| `?smooth=1`、Lenis 可用、非触屏 | Lenis 平滑滚动 |
+| 默认或触屏设备 | 浏览器原生滚动 |
 
-注意
-- 使用 GSAP 时，可在 URL 添加 `?debug=1` 查看 ScrollTrigger 标记；
-- 在系统开启“减少动效”时，复杂动画将自动停用。
+调试参数：
 
+- `?debug=1`：在 GSAP 路径显示 ScrollTrigger 标记。
+- `?animation=native`：确定性进入原生降级路径。
+- `?animation=reduced`：确定性进入减少动效路径。
+- `?smooth=1`：在满足条件时显式启用 Lenis。
+- `?input=touch`：本地验收时模拟触屏输入分支。
 
-## 联系表单（Formspree）接入说明
+所有路径都必须保持主要内容可见、导航和产品卡可交互。依赖缺失不应导致空白页面。
 
-当前 `Contact Us` 区块已内置 Formspree 方案与兜底逻辑：
+## 联系表单配置
 
-1) 配置 Endpoint（必做）
-- 打开 `script.js`，找到：
-  `const FORMSPREE_ENDPOINT = 'https://formspree.io/f/your_form_id';`
-- 将 `your_form_id` 替换为你在 formspree.io 后台创建表单后得到的 ID（形如 `https://formspree.io/f/abcd1234`）。
+`form-config.js` 是浏览器可见的公开配置：
 
-2) 提交数据结构
-- 前端发送 JSON：`{ subject, message, page, ua }`
-  - `subject`：邮件标题（来自页面输入框）
-  - `message`：邮件内容（来自页面文本域）
-  - `page`：提交来源页 URL（自动填充）
-  - `ua`：用户代理（用于排查问题/统计）
+```js
+window.EYAYOO_CONFIG = Object.freeze({
+  formspreeEndpoint: ''
+});
+```
 
-3) 反滥用与安全
-- 已内置蜜罐字段（隐藏输入 `#hp`）与时间陷阱（页面停留 ≥ 2.5s 才允许提交）。
-- 如需更强防护，建议在 Formspree 后台开启 Turnstile/ reCAPTCHA（按官方文档接入）。
+### 默认 mailto 模式
 
-4) 失败兜底（未配置或超额）
-- 若未配置有效 Endpoint，或网络/限额导致失败，前端会自动回退为 `mailto:contact@eyayoo.com`，并将页面输入的标题/内容拼接到邮件客户端。
+- 保持 `formspreeEndpoint` 为空。
+- 用户提交后打开 `mailto:contact@eyayoo.com`，主题和正文来自当前输入。
+- 页面同时显示可直接点击的邮件兜底链接，以便邮件客户端未自动打开时继续操作。
 
-5) UI 行为
-- “复制邮箱”按钮会将 `contact@eyayoo.com` 复制到剪贴板，并在下方显示提示；
-- “发送邮件”按钮优先走 Formspree，失败时回退到 mailto；
-- 表单字段的展示文案在占位符中（无“可选”字样）。
+### 可选 Formspree 模式
 
-6) 可选参数
-- 关闭/开启平滑滚动：默认关闭，若需开启可在 URL 添加 `?smooth=1`；
-- 动画调试：`?debug=1` 显示标记（需本地 GSAP 依赖）。
+- 仅配置合法公开地址，例如 `https://formspree.io/f/abcd1234`。
+- 前端发送 JSON：`{ subject, message, page, ua }`。
+- 网络错误、限额或非成功响应会回到保留当前内容的 mailto 链接。
+- 不要在 `form-config.js` 中放入 token、API key、私有端点或其他秘密。
+
+### 防滥用与状态
+
+- 隐藏蜜罐字段 `#hp` 被填写时拒绝提交。
+- 页面停留不足 2.5 秒时拒绝提交。
+- 发送、成功、失败、复制与等待提示均支持中英文并通过 `aria-live` 对辅助技术播报。
+- 如需更强防滥用，应新建任务评估 Turnstile 或 serverless 代理，不能把私密凭据放入静态前端。

@@ -21,7 +21,17 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://eyayoo.com/zh/privacy.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://eyayoo.com/terms.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://eyayoo.com/zh/terms.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>

@@ -1,16 +1,12 @@
 (() => {
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const params = new URLSearchParams(location.search);
+  const animationOverride = params.get('animation');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches || animationOverride === 'reduced';
+  const forceNativeAnimation = animationOverride === 'native';
   document.documentElement.classList.add('js');
   console.log('[boot] script loaded', { reduceMotion });
   // Detect GSAP availability once for use across branches
-  const hasGSAP = (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined');
-  // 小屏（竖屏/近方屏）用于阈值判断（不再禁用动画）
-  const smallScreen = window.matchMedia('(max-width: 600px)').matches;
-  // 窗口高度较短（例如笔记本占用较多浏览器 UI 或窗口高度较小）时，推迟 About 的进入，减少与 Apps 的视觉交叠
-  const shortHeight = window.matchMedia('(max-height: 740px)').matches;
-
-
-
+  const hasGSAP = !forceNativeAnimation && (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined');
   // 提示但不提前 return，确保交互（点击跳转）仍然可用
   if (reduceMotion) {
     console.log('检测到 prefers-reduced-motion: reduce，已禁用复杂动画');
@@ -39,7 +35,7 @@
       if (window.innerWidth !== lastWidth) {
         lastWidth = window.innerWidth;
         lockSceneHeight();
-        ScrollTrigger.refresh(); 
+        if (hasGSAP) ScrollTrigger.refresh();
       }
     });
     
@@ -47,36 +43,167 @@
     lockSceneHeight();
   }
 
-  // If local GSAP and ScrollTrigger are available, enable advanced animations
-  const params = new URLSearchParams(location.search);
   const debug = params.get('debug') === '1';
-  // 平滑滚动改为“显式开启”，避免惯性导致多次手势
-  const useSmooth = true;
+  // 平滑滚动显式开启，默认使用浏览器原生滚动。
+  const useSmooth = params.get('smooth') === '1';
+  const CONTACT_EMAIL = 'contact@eyayoo.com';
+  const legalPage = document.querySelector('main.policy[data-legal-page]');
+  // Storage may be unavailable in an embedded reader. Reading and switching
+  // languages must remain usable without persistent preferences.
+  function readPreference(key) {
+    try { return localStorage.getItem(key); } catch { return null; }
+  }
+  function savePreference(key, value) {
+    try { localStorage.setItem(key, value); } catch {}
+  }
+  function validLanguage(value) { return value === 'zh' || value === 'en' ? value : null; }
+
+  function positionLegalAnchor() {
+    if (!legalPage || location.hash !== '#data-deletion') return;
+    requestAnimationFrame(() => {
+      const target = document.getElementById('data-deletion');
+      if (!target) return;
+      const header = document.querySelector('.site-header');
+      const headerBottom = header ? header.getBoundingClientRect().bottom : 0;
+      target.style.scrollMarginTop = Math.max(24, headerBottom + 24) + 'px';
+      target.scrollIntoView({ block: 'start', behavior: 'instant' });
+    });
+  }
+
+  function syncLegalLanguage(lang) {
+    if (legalPage) {
+      // Keep a single public anchor, owned by the currently visible translation.
+      legalPage.querySelectorAll('[data-legal-anchor]').forEach((heading) => {
+        const section = heading.closest('[data-legal-lang]');
+        heading.id = section.dataset.legalLang + '-' + heading.dataset.legalAnchor;
+      });
+      legalPage.querySelectorAll('[data-legal-lang]').forEach((section) => {
+        section.hidden = section.dataset.legalLang !== lang;
+        if (!section.hidden && section.dataset.title) document.title = section.dataset.title;
+      });
+      legalPage.querySelectorAll('[data-legal-anchor]').forEach((heading) => {
+        if (heading.closest('[data-legal-lang]').dataset.legalLang === lang) heading.id = heading.dataset.legalAnchor;
+      });
+    }
+    document.querySelectorAll('a[href]').forEach((link) => {
+      // Related links follow the visible document, including header and footer navigation.
+      const href = link.getAttribute('href');
+      if (!href || href.startsWith('#')) return;
+      let target;
+      try { target = new URL(href, location.href); } catch { return; }
+      if (!/^https?:$/.test(target.protocol)) return;
+      if (target.origin !== location.origin && !['eyayoo.com', 'www.eyayoo.com'].includes(target.hostname)) return;
+      if (!/\/(privacy|terms|mahjong-master-data-deletion|contacts)\.html$/.test(target.pathname)) return;
+      const section = link.closest('[data-legal-lang]');
+      target.searchParams.set('lang', section ? section.dataset.legalLang : lang);
+      // Retain the original relative/absolute path and the existing fragment.
+      const path = link.getAttribute('data-deletion-entry') !== null
+        ? (/\/zh\//.test(location.pathname) ? '../privacy.html' : './privacy.html')
+        : href.split(/[?#]/)[0];
+      link.setAttribute('href', path + target.search + target.hash);
+    });
+    positionLegalAnchor();
+  }
+
+  if (legalPage) {
+    window.addEventListener('hashchange', positionLegalAnchor);
+    window.addEventListener('load', positionLegalAnchor);
+    if (document.fonts) document.fonts.ready.then(positionLegalAnchor);
+    // Native readers can inject their stylesheet after the document has loaded.
+    // Reposition only when stylesheets change, not for ordinary DOM updates.
+    if (typeof MutationObserver !== 'undefined' && document.head) {
+      const readerStyles = new MutationObserver((records) => {
+        if (records.some((record) => [...record.addedNodes, ...record.removedNodes]
+          .some((node) => node.nodeName === 'STYLE' || node.nodeName === 'LINK'))) positionLegalAnchor();
+      });
+      readerStyles.observe(document.head, { childList: true });
+    }
+  }
+  const configuredFormEndpoint = String(window.EYAYOO_CONFIG?.formspreeEndpoint || '').trim();
+  const isProductionFormEndpoint = /^https:\/\/formspree\.io\/f\/[a-z0-9_-]+$/i.test(configuredFormEndpoint);
+  // Loopback HTTP is accepted only so the production request path can be exercised locally without external calls.
+  const isLocalTestEndpoint = /^http:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?\/[^\s]+$/i.test(configuredFormEndpoint);
+  const formspreeEndpoint = isProductionFormEndpoint || isLocalTestEndpoint
+    ? configuredFormEndpoint
+    : '';
   // i18n
   const I18N = {
     zh: {
       nav: { home: '首页', products: '应用', about: '关于', contact: '联系', privacy: '隐私', terms: '条款' },
-      hero: { title: '小小欢喜，每天发生', sub: '为每个日常时刻而作' },
+      hero: { title: '小小欢喜\n每天发生', sub: '独立制作的应用，\n陪你创作、学习与玩乐。', cta: '查看作品' },
       products: { title: '我们的产品', desc: '面向全球用户的移动应用，持续打磨体验与品质。' },
-      about: { title: '关于我们', desc: '自 2023 年起，我们从一人起步，成长为一支热忱且专业的团队，致力于让每天都更有趣。目前发布的两款产品收获了来自美国、英国、中国、巴西、香港、日本、比利时、法国、德国等地区玩家的下载与支持。我们专注每一个细节，持续打磨，力求打造独特的移动体验；旅程不会停下，始终以创造被玩家真心喜爱的产品为目标。' },
-      contact: { title: '联系我们', desc: '商务合作与支持，请通过邮箱联系。', subjectPh: '邮件标题', bodyPh: '邮件内容', copy: '复制邮箱', send: '发送邮件' },
+      about: { title: '关于我们', desc: 'Eyayoo Studio 自 2023 年起持续打造移动应用。目前公开发布的两款产品分别聚焦儿童创意绘画与麻将学习训练。我们重视清晰易用的体验，并持续完善产品内容。' },
+      contact: {
+        title: '联系我们', desc: '商务合作与支持，请通过邮箱联系。', subjectPh: '邮件标题', bodyPh: '邮件内容',
+        copy: '复制邮箱', send: '发送邮件', sending: '发送中…', sent: '已发送',
+        status: {
+          copied: '已复制：{email}', copyFailed: '复制失败，请手动复制：{email}',
+          blocked: '发送失败，请稍后再试。', wait: '请稍后再发送…',
+          openingMail: '正在打开邮件客户端；如未自动打开，请点击：',
+          success: '发送成功，我们会尽快回复你。', failed: '发送失败，请改用邮件：'
+        }
+      },
       productsCards: [
-        { title: '儿童奇妙绘画馆 - 绘画启蒙', tag: '教育 / 绘画启蒙', desc: '从简单线条到色彩搭配，帮助儿童快乐启蒙与创意表达，支持离线创作与家长共享。' },
-        { title: '麻将训练 - 大师之路', tag: '益智 / 训练', desc: '通过专项训练与实战练习提升麻将技巧，随时随地巩固牌技，助你迈向大师之路。' }
+        { title: '儿童创意绘画', tag: '给小小创作者的绘画天地', desc: '在涂涂画画和趣味活动中探索色彩，把脑海里的想象变成自己的作品。' },
+        { title: '麻将训练', tag: '从认识规则，到练习胡牌判断', desc: '通过由浅入深的练习熟悉麻将规则，在一道道题目中逐步建立判断能力。' }
       ]
     },
     en: {
       nav: { home: 'Home', products: 'Apps', about: 'About', contact: 'Contact', privacy: 'Privacy', terms: 'Terms' },
-      hero: { title: 'Small joys, made daily', sub: 'Crafting delight for all' },
+      hero: { title: 'Small joys\nmade daily', sub: 'Independent apps for creativity, learning, and play.', cta: 'View our apps' },
       products: { title: 'Our Products', desc: 'Mobile apps for everyone, polished with care.' },
-      about: { title: 'About Us', desc: 'Since 2023, what began as one person in a room has grown into a passionate, professional team devoted to making every day more entertaining. The two titles we have released have already welcomed players from the United States, United Kingdom, China, Brazil, Hong Kong, Japan, Belgium, France, and Germany. We pour our hearts into every detail, refining relentlessly to craft distinctive mobile experiences. Our journey never stops, and we are committed to building products that players truly love.' },
-      contact: { title: 'Contact Us', desc: 'For business and support inquiries, please email us.', subjectPh: 'Email subject', bodyPh: 'Email message', copy: 'Copy Email', send: 'Send Email' },
+      about: { title: 'About Us', desc: 'Eyayoo Studio has been creating mobile experiences since 2023. Our two published apps focus on children\'s creative drawing and practical mahjong learning. We keep refining each product with clear, approachable design and thoughtful updates.' },
+      contact: {
+        title: 'Contact Us', desc: 'For business and support inquiries, please email us.', subjectPh: 'Email subject', bodyPh: 'Email message',
+        copy: 'Copy Email', send: 'Send Email', sending: 'Sending…', sent: 'Sent',
+        status: {
+          copied: 'Copied: {email}', copyFailed: 'Copy failed. Please copy manually: {email}',
+          blocked: 'Unable to send. Please try again later.', wait: 'Please wait a moment before sending…',
+          openingMail: 'Opening your email app. If it does not open, use:',
+          success: 'Message sent. We will reply as soon as possible.', failed: 'Send failed. Please email us at:'
+        }
+      },
       productsCards: [
-        { title: 'Funny Painting — Enlightenment', tag: 'Education / Painting', desc: 'From simple lines to colors, inspire children’s creativity with offline support and easy sharing.' },
-        { title: 'Mahjong Training — Be a Master', tag: 'Puzzle / Training', desc: 'Improve skills with drills and practice anytime, anywhere. Step onto the path to mastery.' }
+        { title: 'Funny Painting', tag: 'A creative playground for little artists', desc: 'Explore colors through drawing and playful activities. Turn everyday imagination into artwork of your own.' },
+        { title: 'Mahjong Training', tag: 'Learn the rules. Build your judgment.', desc: 'Get to know mahjong through step-by-step practice. Build your winning-hand judgment, one challenge at a time.' }
       ]
     }
   };
+  function activeContactText() {
+    const lang = document.documentElement.lang.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+    return I18N[lang].contact;
+  }
+
+  function buildMailto(subject, body) {
+    const query = new URLSearchParams();
+    if (subject) query.set('subject', subject);
+    if (body) query.set('body', body);
+    const suffix = query.toString();
+    return `mailto:${CONTACT_EMAIL}${suffix ? `?${suffix}` : ''}`;
+  }
+
+  function renderContactHint(element, messageKey, mailtoHref = '') {
+    if (!element) return;
+    const message = activeContactText().status[messageKey] || '';
+    element.dataset.contactMessage = messageKey;
+    element.dataset.mailtoHref = mailtoHref;
+    element.replaceChildren(document.createTextNode(message.replace('{email}', CONTACT_EMAIL)));
+    if (mailtoHref) {
+      element.append(document.createTextNode(' '));
+      const link = document.createElement('a');
+      link.href = mailtoHref;
+      link.textContent = CONTACT_EMAIL;
+      element.append(link);
+    }
+  }
+
+  function setSubmitState(button, state) {
+    if (!button) return;
+    button.dataset.contactState = state;
+    const text = activeContactText();
+    button.textContent = text[state] || text.send;
+  }
+
   function applyI18n(lang) {
     const t = I18N[lang] || I18N.en;
     document.documentElement.lang = (lang === 'zh' ? 'zh-CN' : 'en');
@@ -89,6 +216,7 @@
     setText('nav-terms', t.nav.terms);
     setText('hero-title', t.hero.title);
     setText('hero-sub', t.hero.sub);
+    setText('hero-cta', t.hero.cta);
     setText('products-title', t.products.title);
     setText('products-desc', t.products.desc);
     setText('about-title', t.about.title);
@@ -97,8 +225,16 @@
     setText('contact-desc', t.contact.desc);
     const subj = document.getElementById('email-subject'); if (subj) subj.placeholder = t.contact.subjectPh;
     const body = document.getElementById('email-body'); if (body) body.placeholder = t.contact.bodyPh;
-    const copyBtn = document.getElementById('copy-email'); if (copyBtn) copyBtn.textContent = t.contact.copy;
-    const sendBtn = document.getElementById('email-submit'); if (sendBtn) sendBtn.textContent = t.contact.send;
+    const copyBtn = document.getElementById('copy-email');
+    if (copyBtn) { copyBtn.textContent = t.contact.copy; copyBtn.setAttribute('aria-label', t.contact.copy); }
+    const sendBtn = document.getElementById('email-submit');
+    if (sendBtn) {
+      sendBtn.setAttribute('aria-label', t.contact.send);
+      setSubmitState(sendBtn, sendBtn.dataset.contactState || 'send');
+    }
+    document.querySelectorAll('[data-contact-message]').forEach((element) => {
+      renderContactHint(element, element.dataset.contactMessage, element.dataset.mailtoHref || '');
+    });
     const toggle = document.getElementById('lang-toggle'); if (toggle) toggle.textContent = (lang === 'zh' ? 'EN' : '中');
     // Store badges fixed to English per requirement
     const appBadge = document.getElementById('badge-appstore');
@@ -115,6 +251,7 @@
       setText('prod2-tag', c2.tag);
       setText('prod2-desc', c2.desc);
     }
+    syncLegalLanguage(lang);
   }
 
   function setTheme(theme) {
@@ -126,10 +263,6 @@
       document.documentElement.removeAttribute('data-theme');
     }
   }
-  // 动画幅度可调常量（全局复用：GSAP 与原生分支一致）
-  const CARD_SCALE_MAX = 1.035; // 卡片最大缩放
-  const H3_LETTER_MAX = 0.6;    // 标题最大字距(px)
-
   // 锚点配置（可在此调整默认路径锚点）
   function defaultAnchors() {
     return {
@@ -139,25 +272,6 @@
     };
   }
   function getAnchors() { return defaultAnchors(); }
-
-  // 将段落拆分为片段，便于逐行/逐句淡入
-  function splitSegments(el) {
-    if (!el) return [];
-    const text = (el.textContent || '').trim();
-    if (!text) return [];
-    const parts = text.split(/(?<=[。！？!?]|，|,)/).filter(Boolean);
-    if (parts.length <= 1) return [];
-    el.textContent = '';
-    return parts.map((part) => {
-      const span = document.createElement('span');
-      span.textContent = part;
-      span.style.display = 'block';
-      span.style.opacity = '0';
-      span.style.transform = 'translateY(30px)';
-      el.appendChild(span);
-      return span;
-    });
-  }
 
   // 预放置全局光球到指定阶段，避免初始左上角闪烁
   function placeBallsAt(stage) {
@@ -176,159 +290,19 @@
     });
   }
 
-  if (!reduceMotion && hasGSAP) {
-    try {
-      gsap.registerPlugin(ScrollTrigger);
-      // Prevent layout jumps on mobile address bar toggle
-      ScrollTrigger.config({ ignoreMobileResize: true });
-      
-      if (debug) ScrollTrigger.defaults({ markers: true });
-      // 平滑滚动（可选）：仅在非触摸设备上启用 Lenis
-      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      const useSmooth = true;
-      let lenis;
-      if (useSmooth && typeof Lenis !== 'undefined' && !isTouchDevice) {
-        lenis = new Lenis({ smoothWheel: true, duration: 1.0 });
-        function raf(time) { lenis.raf(time); ScrollTrigger.update(); requestAnimationFrame(raf); }
-        requestAnimationFrame(raf);
-      }
-
-      // 初始态
-      // GSAP aniamtions are disabled for layout debugging.
-      const visionBody = document.querySelector('#about .content p');
-      if (visionBody) {
-        visionBody.__segments = splitSegments(visionBody);
-        // 父元素需保持可见，交由子片段控制透明度
-        visionBody.style.opacity = '1';
-      }
-
-      // 初始放置光球至 home 锚点
-      placeBallsAt('home');
-
-      /* --- ANIMATIONS DISABLED FOR LAYOUT DEBUGGING ---
-
-      // 首屏：直接按滚动进度响应（上移 + 放大 + 字距），线性跟随
-      gsap.set('#home .content', { opacity: 1 });
-      ScrollTrigger.create({
-        trigger: '#home', start: 'top top', end: '+=80%', scrub: true,
-        onUpdate: (self) => {
-          const p = self.progress; // 0..1
-          const y = -140 * p; // 更直接的上移反馈
-          const s1 = 1 + 0.12 * p; // h1 放大（均匀）
-          const s2 = 1 + 0.09 * p; // p 放大（均匀）
-          const ls = (0.5 * p).toFixed(3) + 'em';
-          gsap.set('#home .content', { y });
-          gsap.set('#home .content h1', { scale: s1, letterSpacing: ls, transformOrigin: '50% 0%' });
-          gsap.set('#home .content p',  { scale: s2, letterSpacing: ls, transformOrigin: '50% 0%' });
-          // 出场淡出，从 60% 开始逐步降低不透明度
-          const op = 1 - Math.max(0, (p - 0.6) / 0.4);
-          gsap.set('#home .content', { opacity: op });
-        }
-      });
-
-      const productsTl = gsap.timeline({ paused: true })
-        .to('#apps .content h2, #apps .content p', { opacity: 1, y: 0, scale: 1, letterSpacing: '0em', duration: 0.45, ease: 'power1.out' }, 0)
-        .to('#apps .card', { opacity: 1, y: 0, scale: 1, stagger: { each: 0.18 }, duration: 0.45, ease: 'power2.out' }, 0.1);
-
-      // ScrollTrigger 驱动：直接以本段滚动进度控制时间轴
-      ScrollTrigger.create({
-        trigger: '#apps',
-        // 在短视口高度下，略晚开始且更早结束，减少与 About 的交叠
-        start: shortHeight ? 'top 85%' : 'top 80%',
-        end:   shortHeight ? 'top 30%' : 'top 10%',
-        scrub: true,
-        animation: productsTl
-      });
-
-      const aboutTl = gsap.timeline({ paused: true })
-      // 标题保持字间距动画（因为标题通常很短，不容易换行）
-      .fromTo('#about .content h2', { y: 60, opacity: 0, letterSpacing: '0.3em' }, { y: 0, opacity: 1, letterSpacing: '0em', ease: 'none', duration: 0.5 }, 0)
-      // 正文段落移除 letterSpacing，只保留位移和透明度
-      .fromTo('#about .content p',  { y: 60, opacity: 0 }, { y: 0, opacity: 1, ease: 'none', duration: 0.5 }, 0);
-      ScrollTrigger.create({
-        trigger: '#about',
-        start: () => 'top bottom',
-        end:   () => '+=420',
-        scrub: true,
-        animation: aboutTl
-      });
-
-      const contactTl = gsap.timeline({ paused: true })
-      .fromTo('#contact .content h2', { y: 40, opacity: 0, letterSpacing: '0.3em' }, { y: 0, opacity: 1, letterSpacing: '0em', ease: 'none', duration: 0.5 }, 0)
-      // 只保留位移和透明度，正文不再动字间距
-      .fromTo('#contact .content p',  { y: 30, opacity: 0 }, { y: 0, opacity: 1, ease: 'none', duration: 0.5 }, 0.05);
-      ScrollTrigger.create({
-        trigger: '#contact',
-        start: 'top 95%',
-        end:   'top 25%',
-        scrub: true,
-        animation: contactTl
-      });
-
-      // 跨屏全局光球（GSAP）：分段贝塞尔连接各屏锚点（hero -> products -> vision）
-    const g1 = document.querySelector('.gball.g1');
-    const g2 = document.querySelector('.gball.g2');
-    const g3 = document.querySelector('.gball.g3');
-    const anchors = getAnchors();
-    const balls = [g1,g2,g3];
-    function vw(v){ return window.innerWidth * (v/100); }
-    function vh(v){ return window.innerHeight * (v/100); }
-    function bezier(p0,p1,p2,p3,t){ const u=1-t; return { x:u*u*u*p0.x + 3*u*u*t*p1.x + 3*u*t*t*p2.x + t*t*t*p3.x,
-                                                            y:u*u*u*p0.y + 3*u*u*t*p1.y + 3*u*t*t*p2.y + t*t*t*p3.y};}
-    function pt(vwvh){ return { x: vw(vwvh.x), y: vh(vwvh.y) }; }
-    function segCtrl(a,b,dx=10,dy=10){ return [ {x: a.x + vw(dx), y: a.y + vh(dy)}, {x: b.x - vw(dx), y: b.y - vh(dy)} ]; }
-
-      ScrollTrigger.create({
-        trigger: '#home', endTrigger: '#about', start: 'top top', end: 'bottom top', scrub: true,
-        onUpdate: (self) => {
-          const p = self.progress;
-          const sets = [['home','apps'], ['apps','about']];
-          const segLen = sets.length;
-          const seg = Math.min(segLen-1, Math.floor(p*segLen));
-          const segStart = seg/segLen, segEnd = (seg+1)/segLen;
-          const tSeg = (p - segStart)/(segEnd - segStart);
-          const [from,to] = sets[seg];
-          [0,1,2].forEach((i)=>{
-            const a = pt(anchors[from][i]); const b = pt(anchors[to][i]);
-            const [c1,c2] = segCtrl(a,b, (i===1?8:10), (i===2?14:10));
-            const pos = bezier(a,c1,c2,b, tSeg); const el=balls[i];
-            if (el) el.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
-          });
-          // 保持光球透明度一致
-          [g1,g2,g3].forEach(el => { if (el) el.style.opacity = '0.6'; });
-        }
-      });
-
-      */
-
-
-
-
-    // 取消整页淡入，避免“页面已显示后再整体淡入”的观感
-
-    // 取消整页淡入，避免“页面已显示后再整体淡入”的观感
-    } catch (e) {
-      console.warn('[gsap] init error', e);
-    }
-  }
-
-  // 纯原生方案（在未启用 reduce motion 且未加载 GSAP 时使用）：
-  // 保留小屏动画；稳定性靠 svh 与短高度触发策略
+  // 原生降级方案仅在 GSAP/ScrollTrigger 不可用时启动。
 
   const sections = Array.from(document.querySelectorAll('.scene'));
+  const hasSceneAnimations = sections.length > 0 && Boolean(document.querySelector('#home'));
   const lerp = (a, b, t) => a + (b - a) * t;
   const clamp01 = (v) => Math.max(0, Math.min(1, v));
-  // 预拆分第三屏正文，供原生分支使用
-  const nativeVisionBody = document.querySelector('#about .content p');
-  if (nativeVisionBody && !nativeVisionBody.__segments) {
-    nativeVisionBody.__segments = splitSegments(nativeVisionBody);
-  }
-
   function animate() {
     const vh = window.innerHeight;
     const sy = window.scrollY || window.pageYOffset;
 
     for (const sec of sections) {
+      // Hero uses one CSS entrance and normal document scrolling in every mode.
+      if (sec.id === 'home') continue;
       const rect = sec.getBoundingClientRect();
       const top = rect.top + sy; // section 顶部相对文档
       const h = sec.offsetHeight; // 约 300vh
@@ -348,15 +322,6 @@
       if (h2) { h2.style.transform = `translateY(${textY}%)`; }
       if (pTag) { pTag.style.transform = `translateY(${textY * 0.8}%)`; }
 
-      // 首屏文字：随滚动放大与横向拉伸（替代 letter-spacing，避免布局抖动）
-      if (sec.id === 'home') {
-        const s1 = 1 + p * 0.12; // 1.00 -> 1.12
-        const s2 = 1 + p * 0.09; // 1.00 -> 1.09
-        const ls = (0.5 * p).toFixed(3) + 'em';
-        if (h1) { h1.style.transform += ` scale(${s1})`; h1.style.letterSpacing = ls; }
-        if (pTag) { pTag.style.transform += ` scale(${s2})`; pTag.style.letterSpacing = ls; }
-      }
-
       // 产品：进入时整体略微放大 + 字间距
       if (sec.id === 'apps') {
         const s = 1 + Math.max(0, (p - 0.05)) * 0.03;
@@ -367,7 +332,7 @@
         // 基于视窗进入进度的淡入
         const enter = clamp01((vh - rect.top) / (vh * 0.85));
         // 标题与副标题：淡入 + 字距从 0.3em 收束至正常
-        const titles = sec.querySelectorAll('.content h2, .content p');
+        const titles = sec.querySelectorAll('.content > h2, .content > p');
         titles.forEach(el => {
           const y = lerp(60, 0, enter);
           const s = lerp(0.98, 1.02, enter);
@@ -424,191 +389,153 @@
     }
     requestAnimationFrame(animate);
   }
-        // --- MODERN ANIMATION RESTORATION ---
-        
-        // Performance: Reduce blur radius on small screens (mobile) to prevent jank
-        const blurAmount = smallScreen ? '4px' : '10px';
 
-        // 1. Hero Section: Parallax Exit with Blur
-        // As you scroll down, the hero text fades out, moves up, and blurs
-        gsap.to('#home .content', {
-          scrollTrigger: {
-            trigger: '#home',
-            start: 'top top',
-            end: 'bottom center', 
-            scrub: true
-          },
-          y: -50,
+  function showStaticContent(mode) {
+    document.documentElement.dataset.animationMode = mode;
+    document.documentElement.dataset.smoothScroll = 'native';
+    document.querySelectorAll('.scene .content, .scene h1, .scene h2, .scene p, .scene .card, .scene .email-form').forEach((el) => {
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+      el.style.filter = 'none';
+      el.style.letterSpacing = 'normal';
+    });
+    document.querySelectorAll('.gball').forEach((el) => {
+      el.style.opacity = '0';
+    });
+  }
+
+  function initGsapAnimations() {
+    try {
+      gsap.registerPlugin(ScrollTrigger);
+      ScrollTrigger.config({ ignoreMobileResize: true });
+      if (debug) ScrollTrigger.defaults({ markers: true });
+
+      document.documentElement.dataset.animationMode = 'gsap';
+      document.documentElement.dataset.smoothScroll = 'native';
+      const isTouchDevice = params.get('input') === 'touch' || 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      if (useSmooth && typeof Lenis !== 'undefined' && !isTouchDevice) {
+        const lenis = new Lenis({ smoothWheel: true, duration: 1.0 });
+        document.documentElement.dataset.smoothScroll = 'lenis';
+        function raf(time) {
+          lenis.raf(time);
+          ScrollTrigger.update();
+          requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+      }
+
+      placeBallsAt('home');
+
+      // GSAP drives the later scenes; Hero keeps its CSS entrance only.
+      const contentScenes = document.querySelectorAll('.scene:not(#home)');
+      contentScenes.forEach((scene) => {
+        const elems = scene.querySelectorAll('.content > h2, .content > p, .content .card, .content > .email-form');
+        const contentWrapper = scene.querySelector('.content');
+        if (elems.length === 0 || !contentWrapper) return;
+
+        gsap.set(elems, {
+          y: 80,
           opacity: 0,
-          scale: 1.25,
-          filter: `blur(${blurAmount})`, // Adaptive blur
-          ease: 'none'
+          scale: 0.92,
+          filter: 'blur(10px)',
+          transformOrigin: 'center center'
         });
-  
-        // 2. Content Sections: Timeline Scrub (Lifecycle)
-        // Instead of triggering a one-off animation, we link the animation progress directly to the scrollbar.
-        // This creates a "movie strip" effect where you can scrub back and forth through the entrance and exit.
-        
-        const contentScenes = document.querySelectorAll('.scene:not(#home)');
-        
-        contentScenes.forEach(scene => {
-          // Select target elements within this specific scene
-          const elems = scene.querySelectorAll('h2, p, .card, .email-form');
-          // Use the actual content wrapper as the trigger to ensure animation aligns with visible content
-          const contentWrapper = scene.querySelector('.content'); 
-          
-          if (elems.length === 0 || !contentWrapper) return;
 
-          // Set initial state: Lower down, smaller, and blurred for depth
-          gsap.set(elems, { 
-            y: 80, 
-            opacity: 0, 
-            scale: 0.92, 
-            filter: 'blur(10px)',
-            transformOrigin: "center center"
+        gsap.timeline({
+          scrollTrigger: {
+            trigger: contentWrapper,
+            start: 'top 90%',
+            end: 'bottom top',
+            scrub: 0.5
+          }
+        })
+          .to(elems, {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            filter: 'blur(0px)',
+            duration: 0.45,
+            stagger: 0.08,
+            ease: 'power2.out'
+          })
+          .to(elems, { y: 0, duration: 0.1 })
+          .to(elems, {
+            y: -60,
+            opacity: 0,
+            scale: 0.96,
+            filter: 'blur(5px)',
+            duration: 0.45,
+            stagger: 0.05,
+            ease: 'power2.in'
           });
+      });
 
-          const tl = gsap.timeline({
-            scrollTrigger: {
-              trigger: contentWrapper, 
-              start: "top 90%",    
-              end: "bottom top",   
-              scrub: 0.5           
-            }
+      const anchors = getAnchors();
+      const balls = [
+        document.querySelector('.gball.g1'),
+        document.querySelector('.gball.g2'),
+        document.querySelector('.gball.g3')
+      ];
+      const vw = (value) => window.innerWidth * (value / 100);
+      const vh = (value) => window.innerHeight * (value / 100);
+      const point = (anchor) => ({ x: vw(anchor.x), y: vh(anchor.y) });
+      const controls = (a, b, dx = 10, dy = 10) => [
+        { x: a.x + vw(dx), y: a.y + vh(dy) },
+        { x: b.x - vw(dx), y: b.y - vh(dy) }
+      ];
+      const bezier = (p0, p1, p2, p3, t) => {
+        const u = 1 - t;
+        return {
+          x: u*u*u*p0.x + 3*u*u*t*p1.x + 3*u*t*t*p2.x + t*t*t*p3.x,
+          y: u*u*u*p0.y + 3*u*u*t*p1.y + 3*u*t*t*p2.y + t*t*t*p3.y
+        };
+      };
+
+      ScrollTrigger.create({
+        trigger: '#home',
+        endTrigger: '#about',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: true,
+        onUpdate: (self) => {
+          const sets = [['home', 'apps'], ['apps', 'about']];
+          const segment = Math.min(sets.length - 1, Math.floor(self.progress * sets.length));
+          const segmentStart = segment / sets.length;
+          const segmentEnd = (segment + 1) / sets.length;
+          const segmentProgress = (self.progress - segmentStart) / (segmentEnd - segmentStart);
+          const [from, to] = sets[segment];
+
+          balls.forEach((ball, index) => {
+            if (!ball) return;
+            const start = point(anchors[from][index]);
+            const end = point(anchors[to][index]);
+            const [control1, control2] = controls(start, end, index === 1 ? 8 : 10, index === 2 ? 14 : 10);
+            const position = bezier(start, control1, control2, end, segmentProgress);
+            ball.style.transform = `translate(${position.x}px, ${position.y}px)`;
+            ball.style.opacity = '0.6';
           });
+        }
+      });
 
-          // Define the timeline sequence relative to the scroll distance (0% to 100%)
-          tl
-            // 0% - 45%: Entrance (Deep Rise + Focus + Zoom In)
-            .to(elems, {
-              y: 0,
-              opacity: 1,
-              scale: 1,
-              filter: 'blur(0px)', // Clear focus
-              duration: 0.45, 
-              stagger: 0.08, // Tighter stagger for cohesive feel
-              ease: "power2.out"
-            })
-            // 45% - 55%: Hold (Crystal clear center stage)
-            .to(elems, {
-              y: 0, 
-              duration: 0.1 
-            })
-            // 55% - 100%: Exit (Float Away + Blur Out + Slight Zoom Out)
-            .to(elems, {
-              y: -60,
-              opacity: 0,
-              scale: 0.96, // Subtle recession
-              filter: 'blur(5px)', // Soft exit
-              duration: 0.45, 
-              stagger: 0.05,
-              ease: "power2.in"
-            });
-        });
-  
-              // 3. Global Decor Balls: Bézier Curve Path Animation
-              // This restores the complex path movement for the background balls
-              const g1 = document.querySelector('.gball.g1');
-              const g2 = document.querySelector('.gball.g2');
-              const g3 = document.querySelector('.gball.g3');
-              const anchors = getAnchors();
-              const balls = [g1,g2,g3];
-              
-              // Helper functions for path calculation
-              function vw(v){ return window.innerWidth * (v/100); }
-              function vh(v){ return window.innerHeight * (v/100); }
-              function bezier(p0,p1,p2,p3,t){ 
-                const u = 1 - t; 
-                return { 
-                  x: u*u*u*p0.x + 3*u*u*t*p1.x + 3*u*t*t*p2.x + t*t*t*p3.x,
-                  y: u*u*u*p0.y + 3*u*u*t*p1.y + 3*u*t*t*p2.y + t*t*t*p3.y
-                };
-              }
-              function pt(vwvh){ return { x: vw(vwvh.x), y: vh(vwvh.y) }; }
-              function segCtrl(a,b,dx=10,dy=10){ 
-                return [ {x: a.x + vw(dx), y: a.y + vh(dy)}, {x: b.x - vw(dx), y: b.y - vh(dy)} ]; 
-              }
-        
-              ScrollTrigger.create({
-                trigger: '#home', 
-                endTrigger: '#about', 
-                start: 'top top', 
-                end: 'bottom top', 
-                scrub: true,
-                onUpdate: (self) => {
-                  const p = self.progress;
-                  // Define segments: Home -> Apps, Apps -> About
-                  const sets = [['home','apps'], ['apps','about']];
-                  const segLen = sets.length;
-                  // Calculate which segment we are currently in
-                  const seg = Math.min(segLen-1, Math.floor(p*segLen));
-                  const segStart = seg/segLen;
-                  const segEnd = (seg+1)/segLen;
-                  // Normalized progress (0..1) within the current segment
-                  const tSeg = (p - segStart)/(segEnd - segStart);
-                  
-                  const [from,to] = sets[seg];
-                  
-                  [0,1,2].forEach((i)=>{
-                    if (!balls[i]) return;
-                    const a = pt(anchors[from][i]); 
-                    const b = pt(anchors[to][i]);
-                    // Control points for the curve
-                    const [c1,c2] = segCtrl(a,b, (i===1?8:10), (i===2?14:10));
-                    
-                    const pos = bezier(a,c1,c2,b, tSeg); 
-                    balls[i].style.transform = `translate(${pos.x}px, ${pos.y}px)`;
-                    balls[i].style.opacity = '0.6'; // Ensure visibility
-                  });
-                }
-              });
-
-      // Ensure layout is stable before calculating trigger positions
-      window.addEventListener("load", () => ScrollTrigger.refresh());  // 已移除整页淡入：初始即为可见，通过位移/缩放/字距实现进入/离场节奏
-
-  // 首次进入：Hero 文案打字效果（按站点语言优先级选择：URL > localStorage > docDefault）
-  (function typeIntro() {
-    const h1 = document.querySelector('#home .content h1');
-    const p = document.querySelector('#home .content p');
-    const wrap = document.querySelector('#home .content');
-    if (!h1 || !p) return;
-    // 语言选择与文案来源（避免受浏览器语言干扰）
-    const params = new URLSearchParams(location.search);
-    const urlLang = params.get('lang');
-    const storedLang = localStorage.getItem('lang');
-    const docDefault = (document.documentElement.lang || '').toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    const presetAttr = document.documentElement.getAttribute('data-preset-lang');
-    const lang = presetAttr || urlLang || storedLang || docDefault;
-    const t = (typeof I18N !== 'undefined' && I18N[lang]) ? I18N[lang] : (I18N && I18N.en);
-    const text1 = (t && t.hero && t.hero.title) ? t.hero.title : (h1.textContent || '').trim();
-    const text2 = (t && t.hero && t.hero.sub) ? t.hero.sub : (p.textContent || '').trim();
-    // 确保首屏可见以显示打字动画
-    try { if (wrap) wrap.style.opacity = '1'; } catch {}
-    h1.textContent = '';
-    p.textContent = '';
-    let i = 0, j = 0;
-    const speed1 = 30; // ms per char
-    const speed2 = 18;
-    function stepH1() {
-      if (i <= text1.length) {
-        h1.textContent = text1.slice(0, i++);
-        setTimeout(stepH1, speed1);
-      } else {
-        setTimeout(stepP, 120);
-      }
+      window.addEventListener('load', () => ScrollTrigger.refresh());
+    } catch (e) {
+      console.warn('[gsap] init error, using static content', e);
+      showStaticContent('static');
     }
-    function stepP() {
-      if (j <= text2.length) {
-        p.textContent = text2.slice(0, j++);
-        setTimeout(stepP, speed2);
-      }
-    }
-    // Avoid typing while page is hidden by no-i18n-flash
-    (function waitVisible(){
-      if (!document.documentElement.classList.contains('no-i18n-flash')) { stepH1(); }
-      else { setTimeout(waitVisible, 30); }
-    })();
-  })();
+  }
+
+  if (!hasSceneAnimations) {
+    showStaticContent('none');
+  } else if (reduceMotion) {
+    showStaticContent('reduced');
+  } else if (hasGSAP) {
+    initGsapAnimations();
+  } else {
+    document.documentElement.dataset.animationMode = 'native';
+    document.documentElement.dataset.smoothScroll = 'native';
+    placeBallsAt('home');
+    requestAnimationFrame(animate);
+  }
 
   // 设备类型智能跳转：顶部 CTA 根据设备选择应用商店 + 卡片点击跳转对应平台
   (function smartLinks(){
@@ -657,33 +584,41 @@
     window.addEventListener('scroll', onScroll, { passive: true });
     // Language toggle + auto-detect from browser
     const langBtn = document.getElementById('lang-toggle');
-    const urlLang = (new URLSearchParams(location.search)).get('lang');
-    const storedLang = localStorage.getItem('lang');
+    const urlLang = validLanguage(params.get('lang'));
+    const storedLang = validLanguage(readPreference('lang'));
     const browserLangRaw = (navigator.languages && navigator.languages[0]) || navigator.language || '';
     const browserLang = (browserLangRaw || '').toLowerCase().startsWith('zh') ? 'zh' : 'en';
     const docDefault = (document.documentElement.lang || '').toLowerCase().startsWith('zh') ? 'zh' : 'en';
     // Use preset decided in head to avoid flash, fallback to existing order
-    const headPreset = document.documentElement.getAttribute('data-preset-lang');
-    const preset = headPreset || urlLang || storedLang || docDefault || browserLang;
+    const headPreset = validLanguage(document.documentElement.getAttribute('data-preset-lang'));
+    // Root legal URLs are shared by apps: explicit parameters, then browser
+    // language. /zh/ remains a complete Chinese entrypoint even without JS.
+    const legalDefault = /\/(?:zh)\//.test(location.pathname || '') ? 'zh' : browserLang;
+    const preset = urlLang || (legalPage ? legalDefault : headPreset || storedLang || docDefault || browserLang);
     try {
       applyI18n(preset);
-      if (urlLang) localStorage.setItem('lang', preset);
+      if (urlLang) savePreference('lang', preset);
       // Reveal page after i18n applied (no-flash)
       document.documentElement.classList.remove('no-i18n-flash');
     } catch {}
     if (langBtn) {
       langBtn.addEventListener('click', () => {
-        const cur = localStorage.getItem('lang') || preset;
+        const cur = document.documentElement.lang.toLowerCase().startsWith('zh') ? 'zh' : 'en';
         const next = (cur === 'zh' ? 'en' : 'zh');
-        localStorage.setItem('lang', next);
+        savePreference('lang', next);
         applyI18n(next);
+        if (legalPage) {
+          const address = new URL(location.href);
+          address.searchParams.set('lang', next);
+          window.history.replaceState(null, '', address.href);
+        }
       });
     }
 
     // Theme toggle (light/dark)
     const themeBtn = document.getElementById('theme-toggle');
     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const themePreset = localStorage.getItem('theme') || (prefersDark ? 'dark' : 'light');
+    const themePreset = readPreference('theme') || (prefersDark ? 'dark' : 'light');
     setTheme(themePreset);
     if (themeBtn) {
       themeBtn.textContent = (themePreset === 'dark' ? '☀︎' : '☾');
@@ -691,115 +626,95 @@
         const cur = document.documentElement.getAttribute('data-theme') || themePreset;
         const next = (cur === 'dark' ? 'light' : 'dark');
         setTheme(next);
-        localStorage.setItem('theme', next);
+        savePreference('theme', next);
         themeBtn.textContent = (next === 'dark' ? '☀︎' : '☾');
       });
     }
     const el = document.getElementById('smart-cta');
     const ua = navigator.userAgent || navigator.vendor || window.opera;
-    const isAndroid = /Android/i.test(ua);
-    const isIOS = /iPhone|iPad|iPod/i.test(ua);
-    // 顶部按钮已移除，此处仅保留卡片点击跳转
-    // 卡片点击：跳转到对应平台链接（来自 data-ios / data-android）
+    const platformOverride = params.get('platform');
+    const isAndroid = platformOverride ? platformOverride === 'android' : /Android/i.test(ua);
+    const isIOS = platformOverride ? platformOverride === 'ios' : /iPhone|iPad|iPod/i.test(ua);
+    // Adapt icons to the device; download navigation uses native links.
     const grid = document.getElementById('product-grid');
     if (grid) {
-      console.log('[smartLinks] grid found, binding handlers');
-      grid.addEventListener('click', (e) => {
-        // 若点击了卡片内的锚点（如“Learn Mahjong →”），交给默认导航处理
-        if (e.target && e.target.closest('a')) {
-          return; // 不触发卡片整卡跳转
-        }
-        const card = e.target.closest('.card');
-        if (!card) return console.log('[smartLinks] click but not on card');
-        const ios = card.getAttribute('data-ios') || '#';
-        const android = card.getAttribute('data-android') || '#';
-        const target = isIOS ? ios : (isAndroid ? android : ios);
-        console.log('[smartLinks] card click', { isIOS, isAndroid, ios, android, target });
-        if (target && target !== '#') {
-          try {
-            const w = window.open(target, '_blank');
-            if (w) w.opener = null;
-          } catch (err) {
-            console.warn('[smartLinks] navigation error', err);
-          }
+
+      const storePlatform = isAndroid ? 'android' : 'ios';
+      document.documentElement.dataset.storePlatform = storePlatform;
+      grid.querySelectorAll('.card').forEach((card) => {
+        const storeName = card.getAttribute(`data-${storePlatform}-name`) || '';
+        const storeIcon = card.getAttribute(`data-${storePlatform}-icon`) || '';
+        const icon = card.querySelector('.icon');
+        if (icon && storeIcon) {
+          icon.src = storeIcon;
+          icon.alt = `${storeName || 'Product'} icon`;
         }
       });
-      grid.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          const card = e.target.closest('.card');
-          if (!card) return;
-          e.preventDefault();
-          const ios = card.getAttribute('data-ios') || '#';
-          const android = card.getAttribute('data-android') || '#';
-          const target = isIOS ? ios : (isAndroid ? android : ios);
-          console.log('[smartLinks] card keydown', e.key, { isIOS, isAndroid, ios, android, target });
-          if (target && target !== '#') {
-            try {
-              const w = window.open(target, '_blank');
-              if (w) w.opener = null;
-            } catch (err) {
-              console.warn('[smartLinks] navigation error', err);
-            }
-          }
-        }
-      });
+
     } else {
       console.log('[smartLinks] product-grid not found');
     }
 
-    // Contact: build mailto and open client
+    // Contact: copy address, use mailto by default, or submit to an explicitly configured Formspree endpoint.
     const copyBtn = document.getElementById('copy-email');
     if (copyBtn) {
-      const email = 'contact@eyayoo.com';
       const hint = document.getElementById('copy-hint');
       copyBtn.addEventListener('click', async () => {
         try {
-          await navigator.clipboard.writeText(email);
-          if (hint) { hint.textContent = '已复制：' + email; }
-        } catch (e) {
-          if (hint) { hint.textContent = '复制失败，请手动复制：' + email; }
+          await navigator.clipboard.writeText(CONTACT_EMAIL);
+          renderContactHint(hint, 'copied');
+        } catch (error) {
+          renderContactHint(hint, 'copyFailed');
         }
       });
     }
 
-    // Formspree integration (发送邮件)
-    const FORMSPREE_ENDPOINT = 'https://formspree.io/f/your_form_id'; // TODO: replace with your Formspree endpoint
     const formEl = document.getElementById('email-form');
     if (formEl) {
       const started = document.getElementById('email-started');
       if (started) started.value = String(Date.now());
-    }
-    const submitBtn = document.getElementById('email-submit');
-    if (submitBtn) {
-      submitBtn.addEventListener('click', () => {
+      const submitBtn = document.getElementById('email-submit');
+      const submitHint = document.getElementById('submit-hint');
+      formEl.addEventListener('submit', async (event) => {
+        event.preventDefault();
         const subject = (document.getElementById('email-subject')?.value || '').trim();
         const body = (document.getElementById('email-body')?.value || '').trim();
         const hp = (document.getElementById('hp')?.value || '').trim();
         const startedVal = parseInt(document.getElementById('email-started')?.value || '0', 10);
-        const submitHint = document.getElementById('submit-hint');
-        // Basic validations
-        if (hp) { if (submitHint) submitHint.textContent = '发送失败，请稍后再试。'; return; }
-        if (Date.now() - startedVal < 2500) { if (submitHint) submitHint.textContent = '请稍后再发送…'; return; }
-        // Fallback if endpoint not configured
-        if (!FORMSPREE_ENDPOINT || FORMSPREE_ENDPOINT.includes('your_form_id')) {
-          const href = 'mailto:contact@eyayoo.com' + (subject || body ? ('?' + [subject?('subject='+encodeURIComponent(subject)):'', body?('body='+encodeURIComponent(body)):''].filter(Boolean).join('&')) : '');
-          if (submitHint) submitHint.textContent = '未配置服务，已改用邮件客户端…';
-          try { window.location.href = href; } catch(e){ console.warn('mailto error', e); }
+        const mailtoHref = buildMailto(subject, body);
+
+        if (hp) {
+          renderContactHint(submitHint, 'blocked');
           return;
         }
-        submitBtn.disabled = true; const prev = submitBtn.textContent; submitBtn.textContent = '发送中…';
-        fetch(FORMSPREE_ENDPOINT, {
-          method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept':'application/json' },
-          body: JSON.stringify({ subject, message: body, page: location.href, ua: navigator.userAgent })
-        }).then(async (res) => {
-          if (!res.ok) throw new Error('HTTP '+res.status);
-          if (submitHint) submitHint.textContent = '发送成功，我们会尽快回复你。';
-          submitBtn.textContent = '已发送';
-        }).catch((e) => {
-          console.warn('formspree error', e);
-          if (submitHint) submitHint.textContent = '发送失败，请直接发送邮件：contact@eyayoo.com';
-          submitBtn.textContent = prev;
-        }).finally(() => { submitBtn.disabled = false; });
+        if (!Number.isFinite(startedVal) || Date.now() - startedVal < 2500) {
+          renderContactHint(submitHint, 'wait');
+          return;
+        }
+        if (!formspreeEndpoint) {
+          renderContactHint(submitHint, 'openingMail', mailtoHref);
+          window.location.href = mailtoHref;
+          return;
+        }
+
+        if (submitBtn) submitBtn.disabled = true;
+        setSubmitState(submitBtn, 'sending');
+        try {
+          const response = await fetch(formspreeEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ subject, message: body, page: location.href, ua: navigator.userAgent })
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          renderContactHint(submitHint, 'success');
+          setSubmitState(submitBtn, 'sent');
+        } catch (error) {
+          console.warn('[contact] Formspree request failed', error);
+          renderContactHint(submitHint, 'failed', mailtoHref);
+          setSubmitState(submitBtn, 'send');
+        } finally {
+          if (submitBtn) submitBtn.disabled = false;
+        }
       });
     }
   })();
